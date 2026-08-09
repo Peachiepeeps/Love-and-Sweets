@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Love & Sweets ♡ Bakery Merge</title>
+<title>♡ Love and Sweets ♡ Merge Game!</title>
 
 <style>
 :root{
@@ -347,7 +347,7 @@ button:disabled{opacity:.45}
 <div class="game">
 
   <div class="title">♡ Love & Sweets ♡</div>
-  <div class="subtitle">Bakery Merge v0.4</div>
+  <div class="subtitle">Merge Game!</div>
 
   <div class="topbar">
 
@@ -378,7 +378,7 @@ button:disabled{opacity:.45}
   </div>
 
   <div class="controls">
-    <button id="bakeBtn">🍪 Bake!</button>
+    <button id="bakeBtn">Bake!</button>
     <button class="secondary" id="newBtn">↻ New Board</button>
   </div>
 
@@ -401,18 +401,18 @@ button:disabled{opacity:.45}
 
   <div class="legend">
     <strong>Merge chain:</strong><br>
-    Sugar Cookie → Cake Slice → Cupcake → Cake → Wedding Cake ✨
+    Sugar Cookie → Cake Slice → Cupcake → Cake → Wedding Cake!
     <br><br>
-    Wedding Cakes appear, sparkle, then disappear and count toward your goal.<br>
-    Rare Heart Refills can appear when you Bake — tap one to restore energy.
+    Wedding Cakes appear then disappears and counts toward your goal!<br>
+    Rare Heart Refills can appear when you Bake! Tap one to restore energy!
   </div>
 
 </div>
 
 <div class="modal" id="winModal">
   <div class="modal-card">
-    <h2>Bakery Complete! ♡</h2>
-    <p>You made 3 Wedding Cakes!</p>
+    <h2>Game Complete!</h2>
+    <p>You win!</p>
     <p><strong>+50 Heart Coins</strong></p>
     <button id="nextRoundBtn">Start New Bakery</button>
   </div>
@@ -589,7 +589,7 @@ function beginDrag(e,index){
   if(state.board[index]===null) return;
 
   if(state.board[index]==="refill"){
-    messageEl.textContent="💗 Tap the Heart Refill to restore energy!";
+    messageEl.textContent="💗 Tap the Heart Refill to restore your energy! 💗";
     return;
   }
 
@@ -786,7 +786,7 @@ function moveOrMerge(from,to){
 
   if(a===null) return;
   if(a==="refill" || b==="refill"){
-    messageEl.textContent="💗 Heart Refills are used by tapping them!";
+    messageEl.textContent="💗 Heart Refills are used by tapping them! 💗";
     return;
   }
 
@@ -838,7 +838,7 @@ function moveOrMerge(from,to){
       celebrating=false;
 
       messageEl.textContent=
-        `♡ Wedding Cake complete! +${WEDDING_CAKE_REWARD} Heart Coins`;
+        `♡ Wedding Cake complete! ♡ +${WEDDING_CAKE_REWARD} Heart Coins`;
 
       if(state.cakesThisRound>=3){
         state.coins+=ROUND_BONUS;
@@ -933,12 +933,12 @@ function bake(){
   const refillAppeared=maybeSpawnHeartRefill();
 
   if(refillAppeared){
-    messageEl.textContent="💗 Lucky! A Heart Refill appeared!";
+    messageEl.textContent="Lucky!! A Heart Refill appeared!";
   }else{
     messageEl.textContent=
       item===0
-        ? "Fresh Sugar Cookie!"
-        : `✨ Lucky Bake! ${prettyName(item)} appeared!`;
+        ? "Yummy Sugar Cookie!"
+        : `Lucky Bake! ${prettyName(item)} appeared!`;
   }
 
   save();
@@ -990,7 +990,7 @@ function resetRound(){
   state.bakesLeft=STARTING_BAKES;
 
   messageEl.textContent=
-    "New bakery! Tap Bake! to start.";
+    "Tap Bake! to start.";
 
   winModal.classList.remove("show");
 
@@ -1006,7 +1006,7 @@ newBtn.addEventListener("click",()=>{
 
   if(
     confirm(
-      "Start a fresh bakery board? Your Heart Coins and lifetime stats will stay."
+      "Would you like to a fresh bakery board? Your Heart Coins and lifetime stats will stay."
     )
   ){
     resetRound();
