@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Love & Sweets ♡ Bakery Merge</title>
+<title>♡ Love & Sweets ♡</title>
 
 <style>
 :root{
@@ -471,7 +471,7 @@ button:disabled{opacity:.45}
   </div>
 
   <div class="controls">
-    <button id="bakeBtn">🍪 Bake!</button>
+    <button id="bakeBtn">Bake!</button>
     <button class="secondary" id="newBtn">↻ New Board</button>
   </div>
 
@@ -722,7 +722,7 @@ function beginDrag(e,index){
   if(state.board[index]===null) return;
 
   if(state.board[index]==="refill"){
-    messageEl.textContent="💗 Tap the Heart Refill to restore energy!";
+    messageEl.textContent="💗 Tap the Heart to restore energy!";
     return;
   }
 
@@ -852,7 +852,7 @@ function handleTap(e,index){
     boardEl.children[index]?.classList.add("selected");
 
     messageEl.textContent=
-      "Selected! Tap an empty square to move it, or a matching dessert to merge.";
+      "Tap or swipe an empty square to move it, or a matching dessert to merge.";
 
     return;
   }
@@ -971,7 +971,7 @@ function moveOrMerge(from,to){
       celebrating=false;
 
       messageEl.textContent=
-        `♡ Wedding Cake complete! +${WEDDING_CAKE_REWARD} Heart Coins`;
+        `Wedding Cake complete! You win +${WEDDING_CAKE_REWARD} Heart Coins!`;
 
       if(state.cakesThisRound>=3){
         state.coins+=ROUND_BONUS;
@@ -1069,11 +1069,11 @@ function bake(){
   const refillAppeared=maybeSpawnHeartRefill();
 
   if(refillAppeared){
-    messageEl.textContent="💗 Lucky! A Heart Refill appeared!";
+    messageEl.textContent="Lucky! A Heart Refill appeared!";
   }else{
     messageEl.textContent=
       item===0
-        ? "Fresh Sugar Cookie!"
+        ? "Yummy Sugar Cookie!"
         : `✨ Lucky Bake! ${prettyName(item)} appeared!`;
   }
 
@@ -1111,7 +1111,7 @@ function checkRoundEnd(force=false){
     (force && !hasEmpty && !canAnyMerge())
   ){
     messageEl.textContent=
-      `Bakery closed! You made ${state.cakesThisRound}/3 Wedding Cakes.`;
+      `You win! You made ${state.cakesThisRound}/3 Wedding Cakes.`;
 
     bakeBtn.disabled=true;
   }
@@ -1126,7 +1126,7 @@ function resetRound(){
   state.bakesLeft=STARTING_BAKES;
 
   messageEl.textContent=
-    "New bakery! Tap Bake! to start.";
+    "Tap Bake! to start.";
 
   winModal.classList.remove("show");
 
@@ -1142,7 +1142,7 @@ newBtn.addEventListener("click",()=>{
 
   if(
     confirm(
-      "Start a fresh bakery board? Your Heart Coins and lifetime stats will stay."
+      "Would you like to start a new board? Your Heart Coins and lifetime stats will stay the same."
     )
   ){
     resetRound();
