@@ -1,0 +1,1244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
+<title>Love & Sweets</title>
+<style>
+:root{
+  --ink:#27314a;
+  --shadow:rgba(25,35,65,.18);
+  --pink:#ff5a9a;
+  --panel:rgba(255,255,255,.78);
+}
+*{box-sizing:border-box}
+html,body{
+  margin:0;
+  min-height:100%;
+  font-family:"Trebuchet MS",Arial,sans-serif;
+  color:var(--ink);
+  background:#dfe6f4;
+}
+body{
+  min-height:100vh;
+  margin:0;
+  overflow:hidden;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:#202536;
+}
+
+#app{
+  position:relative;
+  width:min(100vw, calc(100vh * 16 / 9));
+  height:min(100vh, calc(100vw * 9 / 16));
+  aspect-ratio:16 / 9;
+  overflow:hidden;
+  background:#dfe6f4;
+}
+
+.room-stage{
+  position:absolute;
+  inset:0;
+  overflow:hidden;
+}
+
+.room-layer{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  object-fit:fill;
+  user-select:none;
+  pointer-events:none;
+}
+
+.rotate-screen{
+  display:none;
+  position:fixed;
+  inset:0;
+  z-index:9999;
+  background:#eef2f7;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  padding:30px;
+}
+
+.rotate-card{
+  background:rgba(255,255,255,.92);
+  border:3px solid white;
+  border-radius:26px;
+  box-shadow:0 12px 30px rgba(35,45,70,.18);
+  padding:24px 28px;
+  color:#536797;
+  font-weight:900;
+  font-size:20px;
+  line-height:1.4;
+}
+
+.rotate-phone{
+  display:block;
+  font-size:48px;
+  margin-bottom:10px;
+  animation:rotateHint 1.8s ease-in-out infinite alternate;
+}
+
+@keyframes rotateHint{
+  from{transform:rotate(0deg)}
+  to{transform:rotate(90deg)}
+}
+
+@media (orientation:portrait){
+  #app{display:none}
+  .rotate-screen{display:flex}
+}
+
+
+
+.shiyu-pixel-out{
+  animation:shiyuGlitchOut .52s steps(1,end) forwards;
+}
+
+.shiyu-pixel-in{
+  animation:shiyuGlitchIn .52s steps(1,end) forwards;
+}
+
+@keyframes shiyuGlitchOut{
+  0%{
+    opacity:1;
+    transform:translate(0,0) scale(1);
+    filter:none;
+  }
+  14%{
+    opacity:.96;
+    transform:translate(-3px,0) scale(1.002);
+    filter:
+      contrast(1.18)
+      saturate(1.15)
+      drop-shadow(3px 0 0 rgba(90,210,255,.46))
+      drop-shadow(-2px 0 0 rgba(255,105,190,.40));
+  }
+  27%{
+    opacity:.88;
+    transform:translate(4px,-1px) scale(.998);
+    filter:
+      contrast(1.30)
+      saturate(1.28)
+      drop-shadow(-4px 0 0 rgba(255,90,175,.46))
+      drop-shadow(3px 1px 0 rgba(95,220,255,.42));
+  }
+  40%{
+    opacity:.78;
+    transform:translate(-4px,1px) scale(1.004);
+    filter:
+      contrast(1.42)
+      saturate(1.4)
+      drop-shadow(4px 0 0 rgba(95,220,255,.42))
+      drop-shadow(-3px -1px 0 rgba(190,120,255,.34));
+  }
+  54%{
+    opacity:.63;
+    transform:translate(3px,0) scale(.996);
+    filter:
+      contrast(1.55)
+      saturate(1.52)
+      drop-shadow(-4px 0 0 rgba(255,105,190,.38))
+      drop-shadow(3px 0 0 rgba(80,225,255,.40));
+  }
+  68%{
+    opacity:.46;
+    transform:translate(-3px,-1px) scale(1.005);
+    filter:
+      contrast(1.7)
+      saturate(1.65)
+      drop-shadow(3px 0 0 rgba(100,220,255,.34))
+      drop-shadow(-3px 0 0 rgba(205,120,255,.30));
+  }
+  82%{
+    opacity:.27;
+    transform:translate(2px,1px) scale(.994);
+    filter:
+      contrast(1.9)
+      saturate(1.8)
+      drop-shadow(-2px 0 0 rgba(255,115,180,.28))
+      drop-shadow(2px 0 0 rgba(85,220,255,.28));
+  }
+  92%{
+    opacity:.12;
+    transform:translate(-1px,0) scale(1.01);
+    filter:
+      contrast(2.1)
+      saturate(2);
+  }
+  100%{
+    opacity:0;
+    transform:translate(0,0) scale(.985);
+    filter:
+      contrast(2.2)
+      saturate(2.1);
+  }
+}
+
+@keyframes shiyuGlitchIn{
+  0%{
+    opacity:0;
+    transform:translate(0,0) scale(.985);
+    filter:
+      contrast(2.2)
+      saturate(2.1);
+  }
+  12%{
+    opacity:.14;
+    transform:translate(2px,0) scale(1.01);
+    filter:
+      contrast(2)
+      saturate(1.9)
+      drop-shadow(2px 0 0 rgba(85,220,255,.28))
+      drop-shadow(-2px 0 0 rgba(255,110,185,.28));
+  }
+  26%{
+    opacity:.31;
+    transform:translate(-3px,1px) scale(.995);
+    filter:
+      contrast(1.82)
+      saturate(1.72)
+      drop-shadow(-3px 0 0 rgba(255,100,180,.34))
+      drop-shadow(3px 0 0 rgba(90,220,255,.34));
+  }
+  41%{
+    opacity:.50;
+    transform:translate(4px,-1px) scale(1.004);
+    filter:
+      contrast(1.62)
+      saturate(1.55)
+      drop-shadow(4px 0 0 rgba(95,220,255,.40))
+      drop-shadow(-3px 0 0 rgba(195,115,255,.30));
+  }
+  57%{
+    opacity:.69;
+    transform:translate(-4px,0) scale(.998);
+    filter:
+      contrast(1.45)
+      saturate(1.40)
+      drop-shadow(-4px 0 0 rgba(255,105,185,.38))
+      drop-shadow(3px 0 0 rgba(85,215,255,.38));
+  }
+  72%{
+    opacity:.84;
+    transform:translate(3px,1px) scale(1.003);
+    filter:
+      contrast(1.30)
+      saturate(1.28)
+      drop-shadow(3px 0 0 rgba(90,215,255,.34))
+      drop-shadow(-2px 0 0 rgba(255,115,190,.30));
+  }
+  87%{
+    opacity:.95;
+    transform:translate(-2px,0) scale(1);
+    filter:
+      contrast(1.15)
+      saturate(1.12);
+  }
+  100%{
+    opacity:1;
+    transform:translate(0,0) scale(1);
+    filter:none;
+  }
+}
+
+.character-hotspot{
+  position:absolute;
+  z-index:18;
+  border:0;
+  padding:0;
+  background:transparent;
+  cursor:pointer;
+  -webkit-tap-highlight-color:transparent;
+}
+
+.character-hotspot:active{
+  transform:scale(.995);
+}
+
+.shiyu-hotspot{
+  left:24%;
+  top:54%;
+  width:25%;
+  height:45%;
+}
+
+.yukine-hotspot{
+  left:54%;
+  top:36%;
+  width:23%;
+  height:63%;
+}
+
+.top-ui{
+  position:absolute;
+  top:14px;
+  left:14px;
+  right:14px;
+  display:flex;
+  justify-content:flex-end;
+  align-items:flex-start;
+  z-index:20;
+  pointer-events:none;
+}
+.coins-box{
+  background:var(--panel);
+  border:3px solid white;
+  border-radius:18px;
+  box-shadow:0 5px 16px var(--shadow);
+  padding:10px 14px;
+  pointer-events:auto;
+}
+.coins-box{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  font-weight:900;
+}
+.coins-box img{
+  width:24px;
+  height:24px;
+  object-fit:contain;
+}
+
+.phone-hotspot{
+  position:absolute;
+  left:1.2%;
+  top:1.8%;
+  width:13.5%;
+  height:22%;
+  z-index:25;
+  border:0;
+  padding:0;
+  background:transparent;
+  cursor:pointer;
+  -webkit-tap-highlight-color:transparent;
+}
+.phone-hotspot:active{transform:scale(.96)}
+
+.phone-label{
+  position:absolute;
+  left:7.2%;
+  top:4.1%;
+  transform:translateX(-50%);
+  z-index:24;
+  font-weight:900;
+  font-size:clamp(10px,1.15vw,18px);
+  color:white;
+  letter-spacing:.8px;
+  text-shadow:0 2px 4px rgba(0,0,0,.35);
+  pointer-events:none;
+}
+
+.overlay{
+  position:absolute;
+  inset:0;
+  background:rgba(22,29,49,.42);
+  backdrop-filter:blur(2px);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  z-index:40;
+  padding:14px;
+}
+.overlay.show{display:flex}
+
+.phone-modal{
+  position:relative;
+  width:min(96vw, 1100px);
+  height:auto;
+  aspect-ratio:16 / 9;
+  animation:popIn .18s ease-out;
+}
+@keyframes popIn{
+  from{transform:scale(.95); opacity:.6}
+  to{transform:scale(1); opacity:1}
+}
+.phone-layer{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  object-fit:contain;
+  user-select:none;
+  pointer-events:none;
+}
+.phone-art{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  object-fit:fill;
+  pointer-events:none;
+  user-select:none;
+}
+
+.phone-hot{
+  position:absolute;
+  z-index:15;
+  border:0;
+  padding:0;
+  background:transparent;
+  cursor:pointer;
+  -webkit-tap-highlight-color:transparent;
+}
+
+.phone-hot:active{
+  transform:scale(.97);
+}
+
+.phone-text{
+  position:absolute;
+  z-index:16;
+  transform:translate(-50%,-50%);
+  font-weight:900;
+  font-size:clamp(10px,1.15vw,17px);
+  color:#294063;
+  text-shadow:0 1px 0 rgba(255,255,255,.75);
+  pointer-events:none;
+  text-align:center;
+  white-space:nowrap;
+}
+
+.label-tl{left:41.3%; top:55.7%}
+.label-tr{left:62.7%; top:55.7%}
+.label-bl{left:41.3%; top:84.3%}
+.label-br{left:62.7%; top:84.3%}
+.label-date{
+  left:52%;
+  top:72%;
+  color:#6f5320;
+}
+
+.hot-tl{left:36.5%; top:53.5%; width:10%; height:11%}
+.hot-tr{left:57.7%; top:53.5%; width:10%; height:11%}
+.hot-bl{left:36.5%; top:78.5%; width:10%; height:11%}
+.hot-br{left:57.7%; top:78.5%; width:10%; height:11%}
+.hot-date{left:45%; top:63%; width:14%; height:19%}
+.hot-close{left:67.5%; top:1.5%; width:6.5%; height:10%}
+
+.crown-glow{
+  animation:crownPulse 1.7s ease-in-out infinite alternate;
+}
+@keyframes crownPulse{
+  from{opacity:.52}
+  to{opacity:1}
+}
+
+
+
+.ui-shiyu-hotspot{
+  position:absolute;
+  z-index:22;
+  left:38%;
+  top:15%;
+  width:25%;
+  height:36%;
+  border:0;
+  background:transparent;
+  padding:0;
+  cursor:pointer;
+  -webkit-tap-highlight-color:transparent;
+}
+
+.ui-speech-text{
+  position:absolute;
+  z-index:20;
+  left:39.3%;
+  top:22.8%;
+  width:10%;
+  transform:translate(-50%,-50%);
+  text-align:center;
+  font-weight:900;
+  font-size:clamp(9px,1vw,15px);
+  line-height:1.05;
+  color:#6b5362;
+  pointer-events:none;
+  white-space:normal;
+}
+
+
+.status-panel{
+  position:absolute;
+  left:50%;
+  top:50%;
+  transform:translate(-50%,-50%);
+  z-index:65;
+  width:min(72%,520px);
+  max-height:82%;
+  overflow:auto;
+  display:none;
+  background:rgba(250,252,255,.98);
+  border:3px solid white;
+  border-radius:24px;
+  box-shadow:0 12px 28px rgba(18,25,45,.24);
+  padding:18px 18px 16px;
+  color:#31456b;
+}
+
+.status-panel.show{
+  display:block;
+}
+
+
+.status-close{
+  position:absolute;
+  top:10px;
+  right:10px;
+  z-index:80;
+  width:30px;
+  height:30px;
+  border:0;
+  border-radius:50%;
+  padding:0 0 2px;
+  background:#e7ecfb;
+  color:#53668c;
+  font:900 24px/28px Arial,sans-serif;
+  text-align:center;
+  cursor:pointer;
+  box-shadow:0 2px 6px rgba(24,35,60,.16);
+  -webkit-tap-highlight-color:transparent;
+}
+.status-close:active{
+  transform:scale(.94);
+}
+
+.status-title{
+  text-align:center;
+  font-size:24px;
+  font-weight:900;
+  color:#ff5a9a;
+  margin-bottom:14px;
+}
+
+.status-section{
+  background:#eef3ff;
+  border:2px solid white;
+  border-radius:18px;
+  padding:12px 14px;
+  margin-bottom:10px;
+}
+
+.status-name{
+  font-weight:900;
+  font-size:18px;
+  margin-bottom:6px;
+}
+
+.status-hearts{
+  font-size:24px;
+  line-height:1;
+  letter-spacing:2px;
+  margin-bottom:6px;
+  color:#ed6f9d;
+}
+
+.status-affection{
+  font-size:13px;
+  font-weight:900;
+  opacity:.85;
+}
+
+.status-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px;
+  margin-top:10px;
+}
+
+.status-stat{
+  background:white;
+  border-radius:14px;
+  padding:10px;
+  text-align:center;
+  font-size:13px;
+  font-weight:900;
+}
+
+.status-stat strong{
+  display:block;
+  font-size:18px;
+  margin-top:2px;
+}
+
+
+
+@media(max-width:950px) and (orientation:landscape){
+  .status-panel{
+    width:min(64%,500px);
+    max-height:78%;
+    padding:12px;
+  }
+
+  .status-title{
+    font-size:20px;
+    margin-bottom:10px;
+  }
+
+  .status-hearts{
+    font-size:20px;
+  }
+
+  .status-section{
+    padding:9px 11px;
+  }
+
+  .status-stat{
+    padding:7px;
+    font-size:11px;
+  }
+
+  .status-stat strong{
+    font-size:15px;
+  }
+}
+
+.games-panel{
+  position:absolute;
+  left:50%;
+  top:50%;
+  transform:translate(-50%,-50%);
+  width:min(78vw, 340px);
+  background:rgba(250,252,255,.96);
+  border:3px solid white;
+  border-radius:24px;
+  box-shadow:0 12px 28px rgba(18,25,45,.2);
+  padding:18px 16px 16px;
+  display:none;
+  z-index:60;
+}
+.games-panel.show{display:block}
+.games-title{
+  text-align:center;
+  font-size:24px;
+  font-weight:900;
+  color:#ff5a9a;
+  margin-bottom:14px;
+}
+.games-btn{
+  width:100%;
+  border:0;
+  border-radius:18px;
+  padding:13px 14px;
+  margin-bottom:10px;
+  font:inherit;
+  font-weight:900;
+  color:#32476f;
+  background:#dce6fb;
+  box-shadow:0 5px 14px rgba(70,85,130,.12);
+}
+.games-btn.secondary{background:#f0dce5}
+.games-btn:active{transform:scale(.99)}
+
+.note-toast{
+  position:absolute;
+  left:50%;
+  bottom:90px;
+  transform:translateX(-50%);
+  z-index:70;
+  background:rgba(255,255,255,.94);
+  border:3px solid white;
+  border-radius:18px;
+  box-shadow:0 6px 18px var(--shadow);
+  padding:10px 14px;
+  font-size:14px;
+  font-weight:900;
+  color:#7a4d68;
+  opacity:0;
+  pointer-events:none;
+  transition:opacity .18s ease;
+}
+.note-toast.show{opacity:1}
+
+
+
+/* ===== MOBILE LANDSCAPE: FULL SCENE, NO CROP ===== */
+
+
+
+
+/* ===== MOBILE LANDSCAPE: FULLSCREEN, NO STRETCH ===== */
+@media (max-width:950px) and (orientation:landscape){
+
+  html,
+  body{
+    position:fixed !important;
+    inset:0 !important;
+    width:100% !important;
+    height:100% !important;
+    margin:0 !important;
+    padding:0 !important;
+    overflow:hidden !important;
+    background:#eef2f7 !important;
+  }
+
+  body{
+    display:block !important;
+  }
+
+  #app{
+    position:fixed !important;
+    inset:0 !important;
+    width:100vw !important;
+    height:100dvh !important;
+    max-width:none !important;
+    max-height:none !important;
+    aspect-ratio:auto !important;
+    margin:0 !important;
+    padding:0 !important;
+    overflow:hidden !important;
+    background:#eef2f7 !important;
+  }
+
+  .room-stage{
+    position:absolute !important;
+    inset:0 !important;
+    width:100% !important;
+    height:100% !important;
+    overflow:hidden !important;
+  }
+
+  /* Preserve the actual 1920×1080 art proportions.
+     Wide phone screens crop a little from the TOP, keeping feet visible. */
+  .room-layer:not(.phone-room-layer){
+    position:absolute !important;
+    inset:0 !important;
+    width:100% !important;
+    height:100% !important;
+    object-fit:cover !important;
+    object-position:center bottom !important;
+  }
+
+  /* The phone launcher is UI, so keep its entire full-canvas placement
+     instead of letting the top crop cut it off. */
+  .phone-room-layer{
+    position:absolute !important;
+    inset:0 !important;
+    width:100% !important;
+    height:100% !important;
+    object-fit:fill !important;
+  }
+
+  .top-ui{
+    top:max(6px,env(safe-area-inset-top)) !important;
+    left:max(6px,env(safe-area-inset-left)) !important;
+    right:max(6px,env(safe-area-inset-right)) !important;
+  }
+
+  .coins-box{
+    padding:6px 9px !important;
+    border-radius:13px !important;
+    font-size:11px !important;
+  }
+
+  .coins-box img{
+    width:18px !important;
+    height:18px !important;
+  }
+
+  /* Keep the phone popup behavior from v9. */
+  .phone-modal{
+    position:absolute !important;
+    inset:0 !important;
+    width:100% !important;
+    height:100% !important;
+    max-width:none !important;
+    max-height:none !important;
+    aspect-ratio:auto !important;
+  }
+
+  .phone-art{
+    width:100% !important;
+    height:100% !important;
+    object-fit:fill !important;
+  }
+
+  .phone-text{
+    font-size:clamp(10px,1.8vw,15px) !important;
+  }
+
+  .hot-close{
+    left:64.5% !important;
+    top:1.2% !important;
+    width:7% !important;
+    height:11% !important;
+    z-index:30 !important;
+  }
+}
+
+</style>
+</head>
+<body>
+
+<div class="rotate-screen">
+  <div class="rotate-card">
+    <span class="rotate-phone">📱</span>
+    Rotate your device sideways ♡<br>
+    Love &amp; Sweets is best played in landscape!
+  </div>
+</div>
+
+<div id="app">
+  <div class="room-stage">
+    <img class="room-layer" src="images/room-bg.png" alt="Yukine's room background">
+    <img class="room-layer" id="windowView" src="images/win-day.png" alt="Window view">
+    <img class="room-layer shiyu-room-layer" src="images/shiyu-base.png" alt="Shiyu base">
+    <img class="room-layer shiyu-room-layer" id="shiyuRoomFace" src="images/shiyu-neutral.png" alt="Shiyu expression">
+    <img class="room-layer" src="images/yukine-base.png" alt="Yukine base">
+    <img class="room-layer" id="yukineRoomFace" src="images/yukine-neutral.png" alt="Yukine expression">
+    <img class="room-layer phone-room-layer" src="images/phone-icon.png" alt="">
+  </div>
+
+  <button class="character-hotspot shiyu-hotspot" id="shiyuTap" aria-label="Tap Shiyu"></button>
+  <button class="character-hotspot yukine-hotspot" id="yukineTap" aria-label="Tap Yukine"></button>
+
+  <div class="top-ui">
+    <div class="coins-box">
+      <img src="images/heart-coin.png" alt="Heart Coin">
+      <span id="coinCount">0</span>
+    </div>
+  </div>
+
+  <button class="phone-hotspot" id="phoneOpenBtn" aria-label="Open phone"></button>
+  <div class="phone-label">PHONE</div>
+
+  <div class="overlay" id="phoneOverlay">
+    <div class="phone-modal">
+      <img class="phone-art" src="images/phone-base.png" alt="Phone UI">
+      <img class="phone-art" src="images/uishiyu-bg.png" alt="">
+      <img class="phone-art" src="images/uishiyu-base.png" alt="Shiyu">
+      <img class="phone-art" id="uiShiyuFace" src="images/uishiyu-neutral.png" alt="">
+      <img class="phone-art" src="images/uishiyu-border.png" alt="">
+      <img class="phone-art" src="images/uishiyu-bubble.png" alt="">
+      <button class="ui-shiyu-hotspot" id="uiShiyuTap" aria-label="Tap Shiyu"></button>
+      <div class="ui-speech-text" id="uiSpeechText"></div>
+
+      <img class="phone-art" src="images/phone-tl.png" alt="">
+      <img class="phone-art" src="images/phone-tr.png" alt="">
+      <img class="phone-art" src="images/phone-bl.png" alt="">
+      <img class="phone-art" src="images/phone-br.png" alt="">
+      <img class="phone-art crown-glow" src="images/phone-crown-glow.png" alt="">
+      <img class="phone-art" src="images/phone-crown.png" alt="">
+      <img class="phone-art" src="images/phone-close.png" alt="">
+
+      <button class="phone-hot hot-tl" id="btnInventory" aria-label="Inventory"></button>
+      <button class="phone-hot hot-tr" id="btnShop" aria-label="Shop"></button>
+      <button class="phone-hot hot-bl" id="btnGames" aria-label="Games"></button>
+      <button class="phone-hot hot-br" id="btnStatus" aria-label="Status"></button>
+      <button class="phone-hot hot-date" id="btnDate" aria-label="Date"></button>
+      <button class="phone-hot hot-close" id="phoneCloseBtn" aria-label="Close phone"></button>
+
+      <div class="phone-text label-tl">Inventory</div>
+      <div class="phone-text label-tr">Shop</div>
+      <div class="phone-text label-bl">Games</div>
+      <div class="phone-text label-br">Status</div>
+      <div class="phone-text label-date">Date</div>
+
+      <div class="status-panel" id="statusPanel">
+        <button class="status-close" id="statusCloseX" aria-label="Close status">×</button>
+        <div class="status-title">♡ Status ♡</div>
+
+        <div class="status-section">
+          <div class="status-name">Shiyu</div>
+          <div class="status-hearts" id="shiyuHearts">♡♡♡♡♡♡♡♡♡♡</div>
+          <div class="status-affection" id="shiyuAffectionText">Affection: 0 / 10</div>
+        </div>
+
+        <div class="status-section">
+          <div class="status-name">Yukine</div>
+          <div class="status-hearts" id="yukineHearts">♡♡♡♡♡♡♡♡♡♡</div>
+          <div class="status-affection" id="yukineAffectionText">Affection: 0 / 10</div>
+        </div>
+
+        <div class="status-grid">
+          <div class="status-stat">Heart Coins<strong id="statusCoins">0</strong></div>
+          <div class="status-stat">Shiyu Pokes<strong id="statusShiyuPokes">0</strong></div>
+          <div class="status-stat">Yukine Pokes<strong id="statusYukinePokes">0</strong></div>
+          <div class="status-stat">Bakery Wins<strong id="statusBakeryWins">0</strong></div>
+          <div class="status-stat">Crane Prizes Won<strong id="statusCranePrizes">0</strong></div>
+        </div>
+</div>
+
+      <div class="games-panel" id="gamesPanel">
+        <div class="games-title">♡ Games ♡</div>
+        <button class="games-btn" id="goBakery">Bakery Merge</button>
+        <button class="games-btn secondary" id="goCrane">Crane Machine — Coming Soon</button>
+        <button class="games-btn secondary" id="closeGames">← Back</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="note-toast" id="toast"></div>
+</div>
+
+<script>
+const windowView=document.getElementById("windowView");
+const coinCount=document.getElementById("coinCount");
+const phoneOpenBtn=document.getElementById("phoneOpenBtn");
+const phoneOverlay=document.getElementById("phoneOverlay");
+const phoneCloseBtn=document.getElementById("phoneCloseBtn");
+const uiShiyuFace=document.getElementById("uiShiyuFace");
+const uiShiyuTap=document.getElementById("uiShiyuTap");
+const uiSpeechText=document.getElementById("uiSpeechText");
+const shiyuRoomFace=document.getElementById("shiyuRoomFace");
+const shiyuRoomLayers=[...document.querySelectorAll(".shiyu-room-layer")];
+const yukineRoomFace=document.getElementById("yukineRoomFace");
+const shiyuTap=document.getElementById("shiyuTap");
+const yukineTap=document.getElementById("yukineTap");
+const btnInventory=document.getElementById("btnInventory");
+const btnShop=document.getElementById("btnShop");
+const btnGames=document.getElementById("btnGames");
+const btnStatus=document.getElementById("btnStatus");
+const btnDate=document.getElementById("btnDate");
+const gamesPanel=document.getElementById("gamesPanel");
+const statusPanel=document.getElementById("statusPanel");
+const shiyuHearts=document.getElementById("shiyuHearts");
+const yukineHearts=document.getElementById("yukineHearts");
+const shiyuAffectionText=document.getElementById("shiyuAffectionText");
+const yukineAffectionText=document.getElementById("yukineAffectionText");
+const statusCoins=document.getElementById("statusCoins");
+const statusCloseX=document.getElementById("statusCloseX");
+const statusShiyuPokes=document.getElementById("statusShiyuPokes");
+const statusYukinePokes=document.getElementById("statusYukinePokes");
+const statusBakeryWins=document.getElementById("statusBakeryWins");
+const statusCranePrizes=document.getElementById("statusCranePrizes");
+const goBakery=document.getElementById("goBakery");
+const goCrane=document.getElementById("goCrane");
+const closeGames=document.getElementById("closeGames");
+const toast=document.getElementById("toast");
+
+function updateCoins(){
+  coinCount.textContent = localStorage.getItem("loveAndSweetsCoins") || "0";
+}
+function syncBakeryCoins(){
+  const bakeryState=localStorage.getItem("loveAndSweetsBakeryV1");
+  if(!bakeryState) return;
+  try{
+    const data=JSON.parse(bakeryState);
+    if(data && typeof data.coins==="number"){
+      localStorage.setItem("loveAndSweetsCoins", String(data.coins));
+    }
+  }catch(e){}
+}
+function chooseWindow(){
+  const hour=new Date().getHours();
+  if(hour>=7 && hour<17){
+    windowView.src="images/win-day.png";
+  }else if(hour>=17 && hour<20){
+    windowView.src="images/win-sunset.png";
+  }else{
+    windowView.src="images/win-night.png";
+  }
+}
+function showToast(text){
+  toast.textContent=text;
+  toast.classList.add("show");
+  clearTimeout(showToast._timer);
+  showToast._timer=setTimeout(()=>toast.classList.remove("show"),1500);
+}
+function openPhone(){
+  shiyuTap.style.pointerEvents="none";
+  gamesPanel.classList.remove("show");
+  statusPanel.classList.remove("show");
+
+  /* Shiyu pixelates out of the room first. */
+  shiyuRoomLayers.forEach(layer=>{
+    layer.classList.remove("shiyu-pixel-in");
+    layer.classList.add("shiyu-pixel-out");
+  });
+
+  setTimeout(()=>{
+    shiyuRoomLayers.forEach(layer=>{
+      layer.style.visibility="hidden";
+      layer.classList.remove("shiyu-pixel-out");
+    });
+
+    phoneOverlay.classList.add("show");
+
+    uiPhoneReaction.locked=false;
+    uiPhoneReaction.count=0;
+    clearTimeout(uiPhoneReaction.faceTimer);
+    clearTimeout(uiPhoneReaction.streakTimer);
+
+    uiShiyuFace.src="images/uishiyu-happy.png";
+    uiSpeechText.textContent="Hello!";
+
+    uiPhoneReaction.faceTimer=setTimeout(()=>{
+      if(!uiPhoneReaction.locked){
+        uiShiyuFace.src="images/uishiyu-neutral.png";
+        uiSpeechText.textContent="";
+      }
+    },1500);
+  },520);
+}
+function closePhone(){
+  clearTimeout(uiPhoneReaction.faceTimer);
+  clearTimeout(uiPhoneReaction.streakTimer);
+
+  uiPhoneReaction.locked=true;
+  uiPhoneReaction.count=0;
+  uiShiyuFace.src="images/uishiyu-angry.png";
+  uiSpeechText.textContent="…";
+
+  setTimeout(()=>{
+    phoneOverlay.classList.remove("show");
+    gamesPanel.classList.remove("show");
+    statusPanel.classList.remove("show");
+
+    uiShiyuFace.src="images/uishiyu-neutral.png";
+    uiSpeechText.textContent="";
+    uiPhoneReaction.locked=false;
+
+    shiyuRoomLayers.forEach(layer=>{
+      layer.style.visibility="visible";
+      layer.classList.remove("shiyu-pixel-out");
+      layer.classList.add("shiyu-pixel-in");
+    });
+
+    setTimeout(()=>{
+      shiyuRoomLayers.forEach(layer=>layer.classList.remove("shiyu-pixel-in"));
+      shiyuTap.style.pointerEvents="auto";
+    },520);
+  },650);
+}
+
+
+/* Persistent Home Hub progression */
+const HUB_SAVE_KEY="loveAndSweetsHubV1";
+
+const hubState={
+  shiyuAffection:0,   // 0-1000 internally = 0-10 hearts
+  yukineAffection:0,
+  shiyuPokes:0,
+  yukinePokes:0,
+  cranePrizes:0
+};
+
+function loadHubState(){
+  const raw=localStorage.getItem(HUB_SAVE_KEY);
+  if(!raw) return;
+
+  try{
+    const saved=JSON.parse(raw);
+    Object.assign(hubState,saved);
+  }catch(e){}
+}
+
+function saveHubState(){
+  localStorage.setItem(HUB_SAVE_KEY,JSON.stringify(hubState));
+}
+
+function affectionHearts(points){
+  const hearts=Math.max(0,Math.min(10,Math.floor(points/100)));
+  return "♥".repeat(hearts)+"♡".repeat(10-hearts);
+}
+
+function affectionLevel(points){
+  return Math.max(0,Math.min(10,Math.floor(points/100)));
+}
+
+function getBakeryStats(){
+  const raw=localStorage.getItem("loveAndSweetsBakeryV1");
+
+  if(!raw){
+    return {coins:Number(localStorage.getItem("loveAndSweetsCoins")||0),bakeryWins:0};
+  }
+
+  try{
+    const data=JSON.parse(raw);
+    return {
+      coins:typeof data.coins==="number" ? data.coins : Number(localStorage.getItem("loveAndSweetsCoins")||0),
+      bakeryWins:typeof data.bakeryWins==="number" ? data.bakeryWins : 0
+    };
+  }catch(e){
+    return {coins:Number(localStorage.getItem("loveAndSweetsCoins")||0),bakeryWins:0};
+  }
+}
+
+function renderStatus(){
+  const bakery=getBakeryStats();
+
+  shiyuHearts.textContent=affectionHearts(hubState.shiyuAffection);
+  yukineHearts.textContent=affectionHearts(hubState.yukineAffection);
+
+  shiyuAffectionText.textContent=`Affection: ${affectionLevel(hubState.shiyuAffection)} / 10`;
+  yukineAffectionText.textContent=`Affection: ${affectionLevel(hubState.yukineAffection)} / 10`;
+
+  statusCoins.textContent=bakery.coins;
+  statusShiyuPokes.textContent=hubState.shiyuPokes;
+  statusYukinePokes.textContent=hubState.yukinePokes;
+  statusBakeryWins.textContent=bakery.bakeryWins;
+  statusCranePrizes.textContent=hubState.cranePrizes;
+}
+
+/* Character tap reactions
+   - normal tap: happy/blushing for 1.5 seconds
+   - 5 quick taps: Shiyu gets angry / Yukine gets shocked
+   - streak resets if you leave them alone for 3 seconds
+*/
+const tapReactions={
+  shiyu:{
+    count:0,
+    locked:false,
+    streakTimer:null,
+    faceTimer:null,
+    face:shiyuRoomFace,
+    happy:"images/shiyu-happy.png",
+    annoyed:"images/shiyu-angry.png",
+    neutral:"images/shiyu-neutral.png"
+  },
+  yukine:{
+    count:0,
+    locked:false,
+    streakTimer:null,
+    faceTimer:null,
+    face:yukineRoomFace,
+    happy:"images/yukine-happy.png",
+    annoyed:"images/yukine-shocked.png",
+    neutral:"images/yukine-neutral.png"
+  }
+};
+
+function reactToTap(character){
+  const data=tapReactions[character];
+
+  /* While angry/shocked is active, ignore extra taps. */
+  if(data.locked) return;
+
+  /* Count every accepted poke permanently. */
+  if(character==="shiyu"){
+    hubState.shiyuPokes++;
+  }else{
+    hubState.yukinePokes++;
+  }
+  saveHubState();
+
+  data.count++;
+
+  clearTimeout(data.streakTimer);
+  clearTimeout(data.faceTimer);
+
+  if(data.count>=5){
+    data.locked=true;
+    data.face.src=data.annoyed;
+    data.count=0;
+
+    data.faceTimer=setTimeout(()=>{
+      data.face.src=data.neutral;
+      data.locked=false;
+    },3000);
+  }else{
+    data.face.src=data.happy;
+
+    data.faceTimer=setTimeout(()=>{
+      data.face.src=data.neutral;
+    },1500);
+  }
+
+  data.streakTimer=setTimeout(()=>{
+    data.count=0;
+  },3000);
+}
+
+shiyuTap.addEventListener("click",()=>reactToTap("shiyu"));
+yukineTap.addEventListener("click",()=>reactToTap("yukine"));
+
+
+
+/* UI Shiyu reactions
+   - open phone: happy + "Hello!" for 1.5 sec
+   - normal tap: happy + "Hey!" for 1.5 sec
+   - 5 quick taps: angry + "Stop that…" for 3 sec
+   - while angry, extra taps are ignored
+   - close phone: brief angry + "…" before closing
+*/
+const uiPhoneReaction={
+  count:0,
+  locked:false,
+  streakTimer:null,
+  faceTimer:null
+};
+
+function reactToUIShiyu(){
+  if(uiPhoneReaction.locked) return;
+
+  hubState.shiyuPokes++;
+  saveHubState();
+
+  uiPhoneReaction.count++;
+
+  clearTimeout(uiPhoneReaction.streakTimer);
+  clearTimeout(uiPhoneReaction.faceTimer);
+
+  if(uiPhoneReaction.count>=5){
+    uiPhoneReaction.locked=true;
+    uiPhoneReaction.count=0;
+
+    uiShiyuFace.src="images/uishiyu-angry.png";
+    uiSpeechText.textContent="Stop that…";
+
+    uiPhoneReaction.faceTimer=setTimeout(()=>{
+      uiShiyuFace.src="images/uishiyu-neutral.png";
+      uiSpeechText.textContent="";
+      uiPhoneReaction.locked=false;
+    },3000);
+  }else{
+    uiShiyuFace.src="images/uishiyu-happy.png";
+    uiSpeechText.textContent="Hey!";
+
+    uiPhoneReaction.faceTimer=setTimeout(()=>{
+      uiShiyuFace.src="images/uishiyu-neutral.png";
+      uiSpeechText.textContent="";
+    },1500);
+  }
+
+  uiPhoneReaction.streakTimer=setTimeout(()=>{
+    uiPhoneReaction.count=0;
+  },3000);
+}
+
+uiShiyuTap.addEventListener("click",reactToUIShiyu);
+
+
+phoneOpenBtn.addEventListener("click",openPhone);
+phoneCloseBtn.addEventListener("click",closePhone);
+
+btnGames.addEventListener("click",()=>{
+  gamesPanel.classList.add("show");
+});
+closeGames.addEventListener("click",()=>gamesPanel.classList.remove("show"));
+btnInventory.addEventListener("click",()=>showToast("Inventory coming soon ♡"));
+btnShop.addEventListener("click",()=>showToast("Shop coming soon ♡"));
+btnStatus.addEventListener("click",()=>{
+  gamesPanel.classList.remove("show");
+  renderStatus();
+  statusPanel.classList.add("show");
+});
+
+
+statusCloseX.addEventListener("click",()=>{
+  statusPanel.classList.remove("show");
+});
+btnDate.addEventListener("click",()=>showToast("Dates coming soon ♡"));
+goCrane.addEventListener("click",()=>showToast("Crane Machine coming soon ♡"));
+goBakery.addEventListener("click",()=>{ window.location.href="bakery/"; });
+
+phoneOverlay.addEventListener("click",(e)=>{
+  if(e.target===phoneOverlay) closePhone();
+});
+
+loadHubState();
+chooseWindow();
+syncBakeryCoins();
+updateCoins();
+renderStatus();
+
+</script>
+</body>
+</html>
