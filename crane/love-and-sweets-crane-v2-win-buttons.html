@@ -1,0 +1,935 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Love & Sweets — Crane Game</title>
+<style>
+*{box-sizing:border-box}
+html,body{
+  margin:0;
+  width:100%;
+  height:100%;
+  overflow:hidden;
+  background:#252635;
+  font-family:"Trebuchet MS",Arial,sans-serif;
+  touch-action:none;
+  user-select:none;
+  -webkit-user-select:none;
+}
+body{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+#rotateNotice{
+  display:none;
+  position:fixed;
+  inset:0;
+  z-index:9999;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  padding:28px;
+  background:#eef4ff;
+  color:#59698d;
+  font-size:22px;
+  font-weight:900;
+}
+
+#stage{
+  position:relative;
+  width:min(100vw,177.7778vh);
+  height:min(56.25vw,100vh);
+  aspect-ratio:16/9;
+  overflow:hidden;
+  background:#4c5662;
+}
+
+/* Full-canvas artwork layers */
+.full-layer{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  object-fit:fill;
+  pointer-events:none;
+}
+
+#machineBackground{z-index:1}
+#machineBack{z-index:3}
+#prizeDropHole{z-index:5}
+#prizeLayer{position:absolute;inset:0;z-index:10;pointer-events:none}
+#clawLayer{position:absolute;inset:0;z-index:14;pointer-events:none}
+#glassPrizeDrop{z-index:17}
+#machineForeground{z-index:20}
+#machineBorder{z-index:24}
+
+/* Prize pieces */
+.prize{
+  position:absolute;
+  width:8.2%;
+  aspect-ratio:1/1;
+  object-fit:contain;
+  transform:translate(-50%,-50%);
+  transform-origin:center;
+  filter:drop-shadow(0 5px 4px rgba(0,0,0,.18));
+  transition:
+    left .48s ease,
+    top .48s ease,
+    transform .32s ease,
+    opacity .32s ease;
+}
+.prize.held{
+  transition:
+    left .08s linear,
+    top .08s linear,
+    transform .18s ease;
+  transform:translate(-50%,-50%) scale(.90);
+}
+.prize.slipping{
+  transition:
+    left .48s ease-in,
+    top .58s cubic-bezier(.3,.05,.72,1.15),
+    transform .58s ease;
+}
+.prize.won{
+  opacity:0;
+  transform:translate(-50%,-50%) scale(.45) rotate(14deg);
+}
+
+/* Claw rig */
+#wire{
+  position:absolute;
+  top:0;
+  width:1.05%;
+  min-width:4px;
+  height:11%;
+  object-fit:fill;
+  transform:translateX(-50%);
+  transform-origin:top center;
+  transition:
+    left .06s linear,
+    height .58s ease-in-out;
+}
+
+#claw{
+  position:absolute;
+  width:10.2%;
+  max-height:38%;
+  object-fit:contain;
+  transform:translate(-50%,0);
+  transform-origin:top center;
+  transition:
+    left .06s linear,
+    top .58s ease-in-out;
+}
+
+/* Joystick */
+#joystick{
+  position:absolute;
+  z-index:36;
+  width:10.5%;
+  left:82.6%;
+  top:69.5%;
+  transform:translate(-50%,-50%);
+  object-fit:contain;
+  cursor:grab;
+  touch-action:none;
+  filter:drop-shadow(0 3px 2px rgba(0,0,0,.14));
+}
+#joystick.dragging{cursor:grabbing}
+
+/* Invisible button zones + HTML labels */
+.machine-button{
+  position:absolute;
+  z-index:38;
+  border:0;
+  padding:0;
+  background:transparent;
+  cursor:pointer;
+  -webkit-tap-highlight-color:transparent;
+  touch-action:manipulation;
+}
+.machine-button:disabled{cursor:default}
+
+#dropButton{
+  left:12.1%;
+  top:82.8%;
+  width:11.8%;
+  height:15%;
+}
+#resetButton{
+  left:32.8%;
+  top:82.8%;
+  width:11.8%;
+  height:15%;
+}
+
+.button-label{
+  position:absolute;
+  z-index:39;
+  transform:translate(-50%,-50%);
+  pointer-events:none;
+  text-align:center;
+  font-weight:1000;
+  line-height:1.05;
+  text-shadow:0 1px 0 rgba(255,255,255,.7);
+}
+#dropLabel{
+  left:18.0%;
+  top:90.8%;
+  color:#385676;
+  font-size:clamp(10px,1.75vw,28px);
+}
+#resetLabel{
+  left:38.7%;
+  top:90.5%;
+  color:#755b68;
+  font-size:clamp(8px,1.28vw,21px);
+}
+
+/* Back + coin UI */
+#homeLink{
+  position:absolute;
+  z-index:60;
+  left:1.5%;
+  top:2.0%;
+  border:3px solid white;
+  border-radius:16px;
+  padding:8px 12px;
+  background:rgba(246,239,255,.95);
+  color:#584a70;
+  text-decoration:none;
+  font-weight:1000;
+  font-size:clamp(9px,1.15vw,18px);
+  box-shadow:0 4px 10px rgba(0,0,0,.12);
+}
+
+#coinBox{
+  position:absolute;
+  z-index:60;
+  right:1.5%;
+  top:2%;
+  display:flex;
+  align-items:center;
+  gap:7px;
+  border:3px solid white;
+  border-radius:17px;
+  padding:7px 11px;
+  background:rgba(255,255,255,.94);
+  color:#39445d;
+  font-weight:1000;
+  font-size:clamp(10px,1.2vw,19px);
+  box-shadow:0 4px 10px rgba(0,0,0,.12);
+}
+#coinBox img{
+  width:clamp(18px,2.2vw,34px);
+  height:clamp(18px,2.2vw,34px);
+  object-fit:contain;
+}
+
+/* Status message */
+#message{
+  position:absolute;
+  z-index:58;
+  left:50%;
+  bottom:2.1%;
+  transform:translateX(-50%);
+  min-width:30%;
+  max-width:52%;
+  padding:7px 15px;
+  border:2px solid white;
+  border-radius:999px;
+  background:rgba(255,247,251,.92);
+  color:#685a70;
+  text-align:center;
+  font-weight:900;
+  font-size:clamp(8px,1.03vw,16px);
+  box-shadow:0 3px 9px rgba(0,0,0,.12);
+  pointer-events:none;
+}
+
+/* Won item toast */
+#winToast{
+  position:absolute;
+  z-index:100;
+  left:50%;
+  top:48%;
+  transform:translate(-50%,-50%) scale(.92);
+  width:min(38%,380px);
+  padding:15px;
+  border:3px solid white;
+  border-radius:22px;
+  background:rgba(255,250,253,.98);
+  box-shadow:0 12px 30px rgba(20,20,35,.24);
+  text-align:center;
+  color:#4f5873;
+  opacity:0;
+  pointer-events:none;
+  transition:opacity .2s ease,transform .2s ease;
+}
+#winToast.show{
+  opacity:1;
+  transform:translate(-50%,-50%) scale(1);
+  pointer-events:auto;
+}
+#winToast img{
+  width:min(40%,120px);
+  aspect-ratio:1/1;
+  object-fit:contain;
+}
+#winToast strong{
+  display:block;
+  color:#ff639d;
+  font-size:clamp(14px,1.65vw,25px);
+}
+#winToast span{
+  font-size:clamp(9px,1vw,15px);
+  font-weight:900;
+}
+
+@media (orientation:portrait){
+  #rotateNotice{display:flex}
+  #stage{display:none}
+}
+
+.win-action-btn{
+  border:0;
+  border-radius:14px;
+  padding:9px 13px;
+  background:#eef3ff;
+  color:#4f5873;
+  text-decoration:none;
+  font:inherit;
+  font-weight:900;
+  cursor:pointer;
+  box-shadow:0 2px 6px rgba(20,20,35,.12);
+  pointer-events:auto;
+}
+.win-action-btn:active{
+  transform:scale(.97);
+}
+
+</style>
+</head>
+<body>
+
+<div id="rotateNotice">Rotate your device sideways ♡</div>
+
+<div id="stage">
+  <!-- Rename/upload your crane artwork to these filenames in /images/ -->
+  <img id="machineBackground" class="full-layer" src="../images/crane-game-background.png" alt="">
+  <img id="machineBack" class="full-layer" src="../images/crane-game-back-of-machine.png" alt="">
+
+  <img id="prizeDropHole" class="full-layer" src="../images/prize-drop-hole.png" alt="">
+
+  <div id="prizeLayer"></div>
+
+  <div id="clawLayer">
+    <img id="wire" src="../images/crane-wire.png" alt="">
+    <img id="claw" src="../images/crane-open.png" alt="">
+  </div>
+
+  <img id="glassPrizeDrop" class="full-layer" src="../images/crane-game-glass-prize-drop.png" alt="">
+  <img id="machineForeground" class="full-layer" src="../images/crane-game-foreground.png" alt="">
+  <img id="machineBorder" class="full-layer" src="../images/crane-game-border.png" alt="">
+
+  <img id="joystick" src="../images/joystick.png" alt="Joystick">
+
+  <button id="dropButton" class="machine-button" aria-label="Drop claw"></button>
+  <button id="resetButton" class="machine-button" aria-label="Reset prizes"></button>
+  <div id="dropLabel" class="button-label">DROP!</div>
+  <div id="resetLabel" class="button-label">RESET<br>🪙 10</div>
+
+  <a id="homeLink" href="../">← Back to Home!</a>
+
+  <div id="coinBox">
+    <img src="../images/heart-coin.png" alt="">
+    <span id="coinCount">0</span>
+  </div>
+
+  <div id="message">Drag the joystick to line up the claw ♡</div>
+
+  <div id="winToast">
+    <img id="winImage" src="" alt="">
+    <strong id="winName"></strong>
+    <span id="winText">Added to Inventory!</span>
+    <div style="display:flex;gap:8px;justify-content:center;margin-top:12px;flex-wrap:wrap;">
+      <button id="keepPlayingBtn" class="win-action-btn">Keep Playing</button>
+      <a id="winHomeBtn" class="win-action-btn" href="../">← Back to Home!</a>
+    </div>
+  </div>
+</div>
+
+<script>
+const INVENTORY_SAVE_KEY="loveAndSweetsInventoryV1";
+const HUB_SAVE_KEY="loveAndSweetsHubV1";
+const CRANE_SAVE_KEY="loveAndSweetsCraneV1";
+
+const prizeCatalog=[
+  {
+    id:"love-letter",
+    name:"Love Letter",
+    image:"../images/love-letter.png",
+    rarity:"Common",
+    catchChance:.50
+  },
+  {
+    id:"teddy-bear",
+    name:"Teddy Bear",
+    image:"../images/teddy-bear.png",
+    rarity:"Common",
+    catchChance:.50
+  },
+  {
+    id:"bouquet",
+    name:"Bouquet",
+    image:"../images/bouquet.png",
+    rarity:"Uncommon",
+    catchChance:.20
+  },
+  {
+    id:"heart-locket",
+    name:"Heart Locket",
+    image:"../images/heart-locket.png",
+    rarity:"Rare",
+    catchChance:.10
+  }
+];
+
+const stage=document.getElementById("stage");
+const prizeLayer=document.getElementById("prizeLayer");
+const wire=document.getElementById("wire");
+const claw=document.getElementById("claw");
+const joystick=document.getElementById("joystick");
+const dropButton=document.getElementById("dropButton");
+const resetButton=document.getElementById("resetButton");
+const coinCount=document.getElementById("coinCount");
+const message=document.getElementById("message");
+const winToast=document.getElementById("winToast");
+const winImage=document.getElementById("winImage");
+const winName=document.getElementById("winName");
+const keepPlayingBtn=document.getElementById("keepPlayingBtn");
+
+let prizes=[];
+let clawX=.34;               // normalized stage x
+let busy=false;
+let heldPrize=null;
+let joystickPointer=null;
+let joystickCenterX=0;
+let joystickMaxPx=42;
+let joystickTilt=0;
+let movementFrame=null;
+let lastMoveTime=performance.now();
+
+/* Machine geometry in normalized 1920x1080 space. */
+const CLAW_MIN_X=.175;
+const CLAW_MAX_X=.765;
+const CLAW_HOME_Y=.115;
+const CLAW_CLOSED_Y=.57;
+const CHUTE_X=.802;
+const CHUTE_DROP_Y=.735;
+
+function sleep(ms){
+  return new Promise(resolve=>setTimeout(resolve,ms));
+}
+
+function clamp(n,min,max){
+  return Math.max(min,Math.min(max,n));
+}
+
+function getCoins(){
+  return Number(localStorage.getItem("loveAndSweetsCoins")||0);
+}
+
+function setCoins(value){
+  const safe=Math.max(0,Math.floor(Number(value)||0));
+  localStorage.setItem("loveAndSweetsCoins",String(safe));
+  coinCount.textContent=safe;
+
+  /* Synchronize Bakery's coin save so it doesn't restore old coins later. */
+  try{
+    const raw=localStorage.getItem("loveAndSweetsBakeryV1");
+    if(raw){
+      const data=JSON.parse(raw);
+      if(data && typeof data==="object"){
+        data.coins=safe;
+        localStorage.setItem("loveAndSweetsBakeryV1",JSON.stringify(data));
+      }
+    }
+  }catch(e){}
+}
+
+function loadInventory(){
+  try{
+    const data=JSON.parse(localStorage.getItem(INVENTORY_SAVE_KEY));
+    return data && typeof data==="object" ? data : {};
+  }catch(e){
+    return {};
+  }
+}
+
+function saveInventory(inv){
+  localStorage.setItem(INVENTORY_SAVE_KEY,JSON.stringify(inv));
+}
+
+function addInventoryItem(id){
+  const inv=loadInventory();
+  inv[id]=Number(inv[id]||0)+1;
+  saveInventory(inv);
+}
+
+function incrementCraneWins(){
+  let hub={};
+  try{
+    const saved=JSON.parse(localStorage.getItem(HUB_SAVE_KEY));
+    if(saved && typeof saved==="object") hub=saved;
+  }catch(e){}
+
+  hub.cranePrizes=Number(hub.cranePrizes||0)+1;
+
+  if(typeof hub.shiyuAffection!=="number") hub.shiyuAffection=0;
+  if(typeof hub.yukineAffection!=="number") hub.yukineAffection=0;
+  if(typeof hub.shiyuPokes!=="number") hub.shiyuPokes=0;
+  if(typeof hub.yukinePokes!=="number") hub.yukinePokes=0;
+
+  localStorage.setItem(HUB_SAVE_KEY,JSON.stringify(hub));
+}
+
+function choosePrize(){
+  const roll=Math.random();
+  const rarity=roll<.65 ? "Common" : roll<.95 ? "Uncommon" : "Rare";
+  const pool=prizeCatalog.filter(p=>p.rarity===rarity);
+  return pool[Math.floor(Math.random()*pool.length)];
+}
+
+function newPrizeLayout(){
+  /* Five medium prizes spread across the main floor, away from the chute. */
+  const lanes=[.285,.395,.505,.615,.705];
+  const yRows=[.635,.665,.625,.67,.64];
+
+  prizes=lanes.map((x,i)=>{
+    const item=choosePrize();
+    return {
+      uid:`${Date.now()}-${i}-${Math.random()}`,
+      id:item.id,
+      name:item.name,
+      image:item.image,
+      rarity:item.rarity,
+      catchChance:item.catchChance,
+      x:clamp(x+(Math.random()-.5)*.035,.25,.73),
+      y:clamp(yRows[i]+(Math.random()-.5)*.025,.60,.69),
+      rotation:(Math.random()-.5)*18
+    };
+  });
+
+  saveCraneState();
+  renderPrizes();
+}
+
+function saveCraneState(){
+  localStorage.setItem(CRANE_SAVE_KEY,JSON.stringify({
+    prizes,
+    clawX
+  }));
+}
+
+function loadCraneState(){
+  try{
+    const saved=JSON.parse(localStorage.getItem(CRANE_SAVE_KEY));
+    if(saved && Array.isArray(saved.prizes) && saved.prizes.length){
+      prizes=saved.prizes;
+      clawX=typeof saved.clawX==="number" ? clamp(saved.clawX,CLAW_MIN_X,CLAW_MAX_X) : clawX;
+      return true;
+    }
+  }catch(e){}
+  return false;
+}
+
+function renderPrizes(){
+  prizeLayer.innerHTML="";
+  prizes.forEach(p=>{
+    const img=document.createElement("img");
+    img.className="prize";
+    img.dataset.uid=p.uid;
+    img.src=p.image;
+    img.alt=p.name;
+    img.style.left=`${p.x*100}%`;
+    img.style.top=`${p.y*100}%`;
+    img.style.transform=`translate(-50%,-50%) rotate(${p.rotation||0}deg)`;
+    prizeLayer.appendChild(img);
+  });
+}
+
+function prizeElement(uid){
+  return prizeLayer.querySelector(`[data-uid="${uid}"]`);
+}
+
+function setMessage(text){
+  message.textContent=text;
+}
+
+function setClawImage(closed){
+  claw.src=closed
+    ? "../images/crane-close.png"
+    : "../images/crane-open.png";
+}
+
+function stageHeight(){
+  return stage.getBoundingClientRect().height;
+}
+
+function setClawPosition(x=clawX,y=CLAW_HOME_Y,animate=true){
+  clawX=clamp(x,CLAW_MIN_X,CLAW_MAX_X);
+
+  const h=stageHeight();
+  const clawTop=y*h;
+  const wireHeight=Math.max(8,clawTop);
+
+  wire.style.transition=animate
+    ? "left .06s linear,height .58s ease-in-out"
+    : "none";
+  claw.style.transition=animate
+    ? "left .06s linear,top .58s ease-in-out"
+    : "none";
+
+  wire.style.left=`${clawX*100}%`;
+  claw.style.left=`${clawX*100}%`;
+  wire.style.height=`${wireHeight}px`;
+  claw.style.top=`${wireHeight}px`;
+
+  if(heldPrize){
+    const el=prizeElement(heldPrize.uid);
+    if(el){
+      /* Hold prize just below the claw body. */
+      el.classList.add("held");
+      el.style.left=`${clawX*100}%`;
+      el.style.top=`${Math.min(.78,y+.16)*100}%`;
+      el.style.transform="translate(-50%,-50%) scale(.90)";
+    }
+  }
+}
+
+function syncClawInstant(){
+  setClawPosition(clawX,CLAW_HOME_Y,false);
+  requestAnimationFrame(()=>{
+    wire.style.transition="";
+    claw.style.transition="";
+  });
+}
+
+function closestPrize(){
+  if(!prizes.length) return null;
+
+  let best=null;
+  let bestDx=Infinity;
+  for(const p of prizes){
+    const dx=Math.abs(p.x-clawX);
+    if(dx<bestDx){
+      best=p;
+      bestDx=dx;
+    }
+  }
+
+  /* Medium/easy target window. */
+  return bestDx<=.052 ? best : null;
+}
+
+function startJoystickMovement(){
+  if(movementFrame) return;
+  lastMoveTime=performance.now();
+
+  const tick=(now)=>{
+    const dt=Math.min(.04,(now-lastMoveTime)/1000);
+    lastMoveTime=now;
+
+    if(!busy && Math.abs(joystickTilt)>.08){
+      const speed=.29; // normalized stage width per second at full tilt
+      clawX=clamp(
+        clawX + joystickTilt*speed*dt,
+        CLAW_MIN_X,
+        CLAW_MAX_X
+      );
+      setClawPosition(clawX,CLAW_HOME_Y,false);
+      saveCraneState();
+    }
+
+    movementFrame=requestAnimationFrame(tick);
+  };
+
+  movementFrame=requestAnimationFrame(tick);
+}
+
+function stopJoystickMovement(){
+  if(movementFrame){
+    cancelAnimationFrame(movementFrame);
+    movementFrame=null;
+  }
+}
+
+joystick.addEventListener("pointerdown",(e)=>{
+  if(busy) return;
+
+  joystickPointer=e.pointerId;
+  joystick.setPointerCapture(e.pointerId);
+  joystick.classList.add("dragging");
+
+  const box=joystick.getBoundingClientRect();
+  joystickCenterX=box.left+box.width/2;
+
+  const stageBox=stage.getBoundingClientRect();
+  joystickMaxPx=Math.max(28,stageBox.width*.032);
+
+  startJoystickMovement();
+  e.preventDefault();
+});
+
+joystick.addEventListener("pointermove",(e)=>{
+  if(e.pointerId!==joystickPointer || busy) return;
+
+  const dx=clamp(e.clientX-joystickCenterX,-joystickMaxPx,joystickMaxPx);
+  joystickTilt=dx/joystickMaxPx;
+  joystick.style.transform=`translate(calc(-50% + ${dx}px),-50%) rotate(${joystickTilt*8}deg)`;
+  e.preventDefault();
+});
+
+function releaseJoystick(e){
+  if(joystickPointer===null) return;
+  if(e && e.pointerId!==joystickPointer) return;
+
+  try{
+    joystick.releasePointerCapture(joystickPointer);
+  }catch(err){}
+
+  joystickPointer=null;
+  joystickTilt=0;
+  joystick.classList.remove("dragging");
+  joystick.style.transition="transform .18s ease";
+  joystick.style.transform="translate(-50%,-50%) rotate(0deg)";
+
+  setTimeout(()=>{
+    joystick.style.transition="";
+  },190);
+
+  stopJoystickMovement();
+}
+
+joystick.addEventListener("pointerup",releaseJoystick);
+joystick.addEventListener("pointercancel",releaseJoystick);
+
+async function showWinToast(prize){
+  winImage.src=prize.image;
+  winName.textContent=prize.name;
+  winToast.classList.add("show");
+
+  await new Promise(resolve=>{
+    const handler=()=>{
+      keepPlayingBtn.removeEventListener("click",handler);
+      winToast.classList.remove("show");
+      resolve();
+    };
+    keepPlayingBtn.addEventListener("click",handler);
+  });
+}
+
+async function dropClaw(){
+  if(busy) return;
+
+  busy=true;
+  dropButton.disabled=true;
+  resetButton.disabled=true;
+  releaseJoystick();
+
+  const target=closestPrize();
+
+  setMessage(target ? `Trying for ${target.name}…` : "The claw drops…");
+  setClawImage(false);
+
+  /* Lower the open claw. */
+  setClawPosition(clawX,CLAW_CLOSED_Y,true);
+  await sleep(620);
+
+  /* Close at the bottom. */
+  setClawImage(true);
+  await sleep(320);
+
+  if(!target){
+    setMessage("Nothing there! Try lining it up a little closer ♡");
+    await sleep(280);
+    setClawPosition(clawX,CLAW_HOME_Y,true);
+    await sleep(620);
+    setClawImage(false);
+
+    busy=false;
+    dropButton.disabled=false;
+    resetButton.disabled=false;
+    saveCraneState();
+    return;
+  }
+
+  /* Visually pick the target up. */
+  heldPrize=target;
+  const targetEl=prizeElement(target.uid);
+  if(targetEl){
+    targetEl.classList.add("held");
+  }
+
+  /* Rise with prize attached. */
+  setClawPosition(clawX,.265,true);
+  await sleep(600);
+
+  const won=Math.random()<target.catchChance;
+
+  if(!won){
+    /* Prize slips from the claw and drops back to the floor. */
+    setMessage(`${target.name} slipped! So close!`);
+
+    heldPrize=null;
+
+    if(targetEl){
+      targetEl.classList.remove("held");
+      targetEl.classList.add("slipping");
+
+      target.x=clamp(target.x+(Math.random()-.5)*.025,.25,.73);
+      target.y=clamp(target.y+(Math.random()-.5)*.012,.61,.69);
+      target.rotation=(Math.random()-.5)*22;
+
+      targetEl.style.left=`${target.x*100}%`;
+      targetEl.style.top=`${target.y*100}%`;
+      targetEl.style.transform=`translate(-50%,-50%) rotate(${target.rotation}deg)`;
+    }
+
+    await sleep(620);
+
+    if(targetEl) targetEl.classList.remove("slipping");
+
+    setClawPosition(clawX,CLAW_HOME_Y,true);
+    await sleep(560);
+    setClawImage(false);
+
+    busy=false;
+    dropButton.disabled=false;
+    resetButton.disabled=false;
+    saveCraneState();
+    return;
+  }
+
+  /* Successful grip: lift to the top. */
+  setMessage(`It held! Taking ${target.name} to the prize chute…`);
+  setClawPosition(clawX,CLAW_HOME_Y,true);
+  await sleep(580);
+
+  /* Travel horizontally to the right-side chute. */
+  const startX=clawX;
+  const travelDuration=760;
+  const started=performance.now();
+
+  await new Promise(resolve=>{
+    const animate=(now)=>{
+      const t=clamp((now-started)/travelDuration,0,1);
+      const eased=t<.5 ? 2*t*t : 1-Math.pow(-2*t+2,2)/2;
+      const x=startX+(CHUTE_X-startX)*eased;
+      setClawPosition(x,CLAW_HOME_Y,false);
+
+      if(t<1){
+        requestAnimationFrame(animate);
+      }else{
+        resolve();
+      }
+    };
+    requestAnimationFrame(animate);
+  });
+
+  await sleep(180);
+
+  /* Open above chute and let the prize fall in. */
+  setClawImage(false);
+  heldPrize=null;
+
+  if(targetEl){
+    targetEl.classList.remove("held");
+    targetEl.style.left=`${CHUTE_X*100}%`;
+    targetEl.style.top=`${CHUTE_DROP_Y*100}%`;
+    targetEl.classList.add("won");
+  }
+
+  await sleep(520);
+
+  addInventoryItem(target.id);
+  incrementCraneWins();
+
+  prizes=prizes.filter(p=>p.uid!==target.uid);
+  saveCraneState();
+
+  setMessage(`You won ${target.name}! Added to Inventory ♡`);
+  await showWinToast(target);
+
+  /* Return claw to a comfortable center position. */
+  const returnX=.46;
+  const returnStart=clawX;
+  const returnDuration=620;
+  const returnStarted=performance.now();
+
+  await new Promise(resolve=>{
+    const animate=(now)=>{
+      const t=clamp((now-returnStarted)/returnDuration,0,1);
+      const x=returnStart+(returnX-returnStart)*t;
+      setClawPosition(x,CLAW_HOME_Y,false);
+
+      if(t<1){
+        requestAnimationFrame(animate);
+      }else{
+        resolve();
+      }
+    };
+    requestAnimationFrame(animate);
+  });
+
+  clawX=returnX;
+  renderPrizes();
+  saveCraneState();
+
+  if(!prizes.length){
+    setMessage("You cleared the machine! Reset the prizes for 10 coins ♡");
+  }
+
+  busy=false;
+  dropButton.disabled=false;
+  resetButton.disabled=false;
+}
+
+function resetPrizes(){
+  if(busy) return;
+
+  const coins=getCoins();
+  if(coins<10){
+    setMessage("Not enough Heart Coins to reset! You need 10 ♡");
+    return;
+  }
+
+  setCoins(coins-10);
+  newPrizeLayout();
+  setMessage("New prizes loaded! Good luck ♡");
+}
+
+dropButton.addEventListener("click",dropClaw);
+resetButton.addEventListener("click",resetPrizes);
+
+window.addEventListener("resize",()=>{
+  syncClawInstant();
+});
+
+setCoins(getCoins());
+
+if(!loadCraneState()){
+  newPrizeLayout();
+}else{
+  renderPrizes();
+}
+
+syncClawInstant();
+</script>
+</body>
+</html>
