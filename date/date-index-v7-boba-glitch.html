@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Love & Sweets — Date</title>
+<style>
+*{box-sizing:border-box}
+html,body{
+  margin:0;
+  width:100%;
+  height:100%;
+  overflow:hidden;
+  background:#1d2230;
+  font-family:"Trebuchet MS",Arial,sans-serif;
+}
+body{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  touch-action:manipulation;
+}
+#stage{
+  position:relative;
+  width:min(100vw,177.7778vh);
+  height:min(56.25vw,100vh);
+  aspect-ratio:16/9;
+  overflow:hidden;
+  background:#9fdcff;
+  box-shadow:0 0 24px rgba(0,0,0,.25);
+}
+.full{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  pointer-events:none;
+}
+#bg{z-index:1}
+
+.character-layer{
+  position:absolute;
+  left:0;
+  top:var(--character-top,-17%);
+  width:100%;
+  height:100%;
+  object-fit:fill;
+  z-index:4;
+  pointer-events:none;
+  user-select:none;
+}
+
+#topBar{
+  position:absolute;
+  z-index:20;
+  left:2.2%;
+  right:2.2%;
+  top:2.2%;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  pointer-events:none;
+}
+.pill{
+  pointer-events:auto;
+  border:3px solid rgba(255,255,255,.95);
+  border-radius:20px;
+  padding:8px 13px;
+  background:rgba(255,246,251,.92);
+  color:#63566d;
+  font-size:clamp(11px,1.2vw,18px);
+  font-weight:900;
+  box-shadow:0 4px 12px rgba(0,0,0,.12);
+}
+#coinPill{
+  display:flex;
+  align-items:center;
+  gap:7px;
+}
+#coinPill img{
+  width:28px;
+  height:28px;
+  object-fit:contain;
+}
+button{font-family:inherit}
+
+#dialogue{
+  position:absolute;
+  z-index:30;
+  left:50%;
+  bottom:2.4%;
+  transform:translateX(-50%);
+  width:76%;
+  min-height:14%;
+  padding:11px 18px 9px;
+  border:4px solid rgba(255,255,255,.96);
+  border-radius:24px;
+  background:rgba(255,246,250,.94);
+  box-shadow:0 8px 24px rgba(0,0,0,.18);
+}
+#speaker{
+  margin-bottom:4px;
+  font-size:clamp(15px,1.7vw,24px);
+  font-weight:900;
+}
+#speaker.shiyu{color:#c87998}
+#speaker.yukine{color:#536b91}
+
+#dialogueText{
+  color:#574f60;
+  font-size:clamp(13px,1.5vw,22px);
+  font-weight:700;
+  line-height:1.24;
+  white-space:pre-line;
+}
+#continueHint{
+  margin-top:5px;
+  text-align:right;
+  color:#93899c;
+  font-size:clamp(10px,1vw,14px);
+  font-weight:800;
+}
+
+#choices{
+  position:absolute;
+  z-index:35;
+  left:50%;
+  bottom:2.4%;
+  transform:translateX(-50%);
+  width:76%;
+  display:none;
+  gap:10px;
+  flex-direction:column;
+}
+.choice{
+  width:100%;
+  border:4px solid white;
+  border-radius:22px;
+  padding:14px 16px;
+  background:rgba(255,246,250,.96);
+  color:#5d5265;
+  font-size:clamp(13px,1.45vw,21px);
+  font-weight:900;
+  box-shadow:0 6px 18px rgba(0,0,0,.16);
+}
+.choice:active{transform:scale(.99)}
+
+#result{
+  position:absolute;
+  z-index:50;
+  inset:0;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  background:rgba(31,28,38,.35);
+}
+#resultCard{
+  width:min(440px,76%);
+  padding:22px;
+  border:4px solid white;
+  border-radius:28px;
+  background:rgba(255,247,251,.98);
+  text-align:center;
+  color:#5d5265;
+  box-shadow:0 12px 34px rgba(0,0,0,.22);
+}
+#resultCard h2{
+  margin:0 0 12px;
+  color:#c05c8a;
+  font-size:clamp(24px,3vw,40px);
+}
+.rewardLine{
+  margin:8px 0;
+  font-size:clamp(16px,1.8vw,25px);
+  font-weight:900;
+}
+.resultBtn{
+  margin:14px 6px 0;
+  border:3px solid white;
+  border-radius:18px;
+  padding:10px 16px;
+  background:#f3d8e7;
+  color:#5e5265;
+  font-size:clamp(12px,1.3vw,18px);
+  font-weight:900;
+}
+
+#intro{
+  position:absolute;
+  z-index:60;
+  inset:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:rgba(28,30,39,.38);
+}
+#introCard{
+  width:min(480px,78%);
+  padding:24px;
+  border:4px solid white;
+  border-radius:28px;
+  background:rgba(255,247,251,.98);
+  text-align:center;
+  color:#5d5265;
+  box-shadow:0 12px 34px rgba(0,0,0,.24);
+}
+#introCard h1{
+  margin:0 0 6px;
+  color:#c05c8a;
+  font-size:clamp(25px,3.2vw,44px);
+}
+#introCard p{
+  margin:8px 0;
+  font-weight:800;
+  font-size:clamp(13px,1.4vw,19px);
+}
+#startDate{
+  margin-top:10px;
+  border:3px solid white;
+  border-radius:18px;
+  padding:11px 18px;
+  background:#f3d8e7;
+  color:#5e5265;
+  font-size:clamp(14px,1.5vw,20px);
+  font-weight:900;
+}
+
+@media (orientation:portrait){
+  body::before{
+    content:"Rotate your device sideways ♡";
+    position:fixed;
+    inset:0;
+    z-index:999;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:30px;
+    background:#f8e7f0;
+    color:#705c70;
+    font-size:24px;
+    font-weight:900;
+    text-align:center;
+  }
+}
+@supports(height:100dvh){
+  #stage{
+    width:min(100vw,calc(100dvh * 1.777778));
+    height:min(56.25vw,100dvh);
+  }
+}
+@media (orientation:landscape) and (max-height:600px){
+  .character-layer{
+    top:var(--character-top-mobile,-21%);
+    object-fit:cover;
+    object-position:center bottom;
+  }
+  #stage{
+    transform:scale(1.045,.965);
+    transform-origin:center center;
+  }
+  #dialogue{
+    width:72%;
+    min-height:13%;
+    padding:7px 12px 6px;
+    border-width:3px;
+    border-radius:18px;
+  }
+  #speaker{margin-bottom:2px}
+  #continueHint{margin-top:2px}
+  #choices{width:72%;gap:7px}
+  .choice{
+    padding:9px 12px;
+    border-width:3px;
+    border-radius:17px;
+  }
+  .pill{
+    border-width:2px;
+    padding:5px 9px;
+    border-radius:14px;
+  }
+  #coinPill img{width:20px;height:20px}
+}
+
+.character-wrap{
+  position:absolute;
+  inset:0;
+  z-index:4;
+  pointer-events:none;
+}
+
+.character-wrap .character-layer{
+  z-index:1;
+}
+
+#shiyuWrap.shiyu-hidden{
+  opacity:0;
+  visibility:hidden;
+}
+
+#shiyuWrap.shiyu-glitch-in{
+  visibility:visible;
+  opacity:1;
+  animation:shiyuGlitchIn .72s steps(1,end);
+  will-change:transform,filter,clip-path,opacity;
+}
+
+@keyframes shiyuGlitchIn{
+  0%{
+    opacity:0;
+    transform:translateX(-18px) scaleX(.98);
+    filter:
+      drop-shadow(14px 0 0 rgba(255,70,180,.9))
+      drop-shadow(-14px 0 0 rgba(70,220,255,.9));
+    clip-path:polygon(0 3%,100% 3%,100% 13%,0 13%);
+  }
+  10%{
+    opacity:.95;
+    transform:translateX(15px);
+    filter:
+      drop-shadow(-12px 0 0 rgba(255,225,70,.8))
+      drop-shadow(12px 0 0 rgba(130,90,255,.9));
+    clip-path:polygon(0 8%,100% 8%,100% 24%,0 24%);
+  }
+  20%{
+    opacity:.4;
+    transform:translateX(-9px);
+    filter:
+      drop-shadow(10px 0 0 rgba(255,70,180,.9))
+      drop-shadow(-9px 0 0 rgba(70,220,255,.9));
+    clip-path:polygon(0 19%,100% 19%,100% 39%,0 39%);
+  }
+  31%{
+    opacity:1;
+    transform:translateX(11px);
+    filter:
+      drop-shadow(-10px 0 0 rgba(80,255,170,.85))
+      drop-shadow(10px 0 0 rgba(255,80,120,.85));
+    clip-path:polygon(0 0,100% 0,100% 18%,0 18%,0 46%,100% 46%,100% 61%,0 61%);
+  }
+  43%{
+    opacity:.75;
+    transform:translateX(-7px);
+    filter:
+      drop-shadow(8px 0 0 rgba(255,70,180,.8))
+      drop-shadow(-8px 0 0 rgba(70,220,255,.9));
+    clip-path:polygon(0 28%,100% 28%,100% 72%,0 72%);
+  }
+  55%{
+    opacity:1;
+    transform:translateX(7px);
+    filter:
+      drop-shadow(-7px 0 0 rgba(255,215,70,.75))
+      drop-shadow(7px 0 0 rgba(100,100,255,.85));
+    clip-path:polygon(0 0,100% 0,100% 35%,0 35%,0 64%,100% 64%,100% 84%,0 84%);
+  }
+  68%{
+    opacity:.55;
+    transform:translateX(-4px);
+    filter:
+      drop-shadow(5px 0 0 rgba(255,70,180,.7))
+      drop-shadow(-5px 0 0 rgba(70,220,255,.8));
+    clip-path:polygon(0 15%,100% 15%,100% 92%,0 92%);
+  }
+  82%{
+    opacity:1;
+    transform:translateX(3px);
+    filter:
+      drop-shadow(-3px 0 0 rgba(255,110,200,.65))
+      drop-shadow(3px 0 0 rgba(80,210,255,.7));
+    clip-path:polygon(0 0,100% 0,100% 100%,0 100%);
+  }
+  100%{
+    opacity:1;
+    transform:none;
+    filter:none;
+    clip-path:polygon(0 0,100% 0,100% 100%,0 100%);
+  }
+}
+
+</style>
+</head>
+<body>
+<div id="stage">
+  <img id="bg" class="full" src="" alt="Date background">
+
+  <div id="shiyuWrap" class="character-wrap">
+    <img class="character-layer" src="../images/shiyu-base.png" alt="Shiyu">
+    <img id="shiyuFace" class="character-layer" src="../images/shiyu-happy.png" alt="Shiyu expression">
+  </div>
+
+  <img class="character-layer" src="../images/yukine-base.png" alt="Yukine">
+  <img id="yukineFace" class="character-layer" src="../images/yukine-neutral.png" alt="Yukine expression">
+
+  <div id="topBar">
+    <button id="homeBtn" class="pill">← Back to Home!</button>
+    <div id="coinPill" class="pill"><img src="../images/heart-coin.png" alt=""> <span id="coinCount">0</span></div>
+  </div>
+
+  <div id="dialogue" style="display:none;">
+    <div id="speaker"></div>
+    <div id="dialogueText"></div>
+    <div id="continueHint">Tap to continue ♡</div>
+  </div>
+
+  <div id="choices">
+    <button class="choice" id="choiceA"></button>
+    <button class="choice" id="choiceB"></button>
+  </div>
+
+  <div id="intro">
+    <div id="introCard">
+      <h1 id="dateTitle">Date ♥</h1>
+      <p id="dateSubtitle"></p>
+      <p id="dateCostText"></p>
+      <button id="startDate">Start Date ♡</button>
+      <button id="introHome" class="resultBtn" type="button">← Back to Home</button>
+    </div>
+  </div>
+
+  <div id="result">
+    <div id="resultCard">
+      <h2>Date Complete! ♥</h2>
+      <div class="rewardLine" id="yukineReward"></div>
+      <div class="rewardLine" id="shiyuReward"></div>
+      <button class="resultBtn" id="resultHome">Back Home</button>
+      <button class="resultBtn" id="againBtn">Another Date</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const HUB_KEY="loveAndSweetsHubV1";
+const COIN_KEY="loveAndSweetsCoins";
+const BAKERY_KEY="loveAndSweetsBakeryV1";
+const DATE_TEST_COIN_FLAG="loveAndSweetsDateTestCoinsV1";
+
+const DATE_DATA={
+  picnic:{
+    title:"🌸 Park Picnic 🌸",
+    subtitle:"A sunny picnic beneath the cherry blossoms.",
+    cost:20,
+    background:"../images/date-picnic-bg.png",
+    characterTop:"-17%",
+    characterTopMobile:"-21%",
+    choices:{
+      A:"Shiyu turns to Yukine and says, “Say ahhhh!”",
+      B:"Yukine notices a cherry blossom fall onto Shiyu’s hair. He gently removes it."
+    },
+    opening:[
+      {speaker:"Shiyu",text:"Ooohhh, it’s so sunny! And look at those! Those are cherry blossoms, right, Yukine?",shiyu:"happy",yukine:"neutral"},
+      {speaker:"Yukine",text:"Too bright… but being here with you makes it okay… Oh, yeah, they are.",shiyu:"happy",yukine:"happy"},
+      {speaker:"Shiyu",text:"So romantic to watch the cherry blossoms fall! I made sandwiches. My research says they’re simple and easy for picnics!",shiyu:"happy",yukine:"happy"},
+      {speaker:"Yukine",text:"I’m hungry, so let’s eat!",shiyu:"happy",yukine:"happy"}
+    ],
+    A:[
+      {speaker:"Yukine",text:"A-ahhhh! My heart is racing…",shiyu:"happy",yukine:"shocked"},
+      {speaker:"Shiyu",text:"You’re so cute! Eat up lots, I made a ton!",shiyu:"happy",yukine:"happy"}
+    ],
+    B:[
+      {speaker:"",text:"There’s a soft moment between them, a single moment of silence as they look at each other.",shiyu:"neutral",yukine:"neutral"},
+      {speaker:"Shiyu",text:"Yukine…",shiyu:"happy",yukine:"shocked"},
+      {speaker:"Yukine",text:"I-I uh, your hair… It had a…",shiyu:"happy",yukine:"shocked"},
+      {speaker:"Shiyu",text:"Hehehe…",shiyu:"happy",yukine:"happy"}
+    ],
+    ending:[
+      {speaker:"Yukine",text:"We should do this again sometime.",shiyu:"happy",yukine:"happy"},
+      {speaker:"Shiyu",text:"Next time I’m bringing dessert!",shiyu:"happy",yukine:"happy"}
+    ],
+    baseYukine:10,
+    baseShiyu:10,
+    choiceABonus:{yukine:5,shiyu:0},
+    choiceBBonus:{yukine:0,shiyu:5}
+  },
+
+  boba:{
+    title:"🧋 Boba Shop 🧋",
+    subtitle:"A sweet stop for milk tea together.",
+    cost:35,
+    background:"../images/date-boba-bg.png",
+    characterTop:"-3%",
+    characterTopMobile:"-6%",
+    choices:{
+      A:"Shiyu goes to the counter.",
+      B:"Yukine notices cute little cakes. He goes to the counter."
+    },
+    opening:[
+      {speaker:"",text:"Yukine is walking home, chatting with Shiyu who is on his phone.",shiyuVisible:false,yukine:"neutral"},
+      {speaker:"",text:"Suddenly, she pops into the physical world.",shiyu:"happy",yukine:"shocked",shiyuGlitchIn:true},
+      {speaker:"Shiyu",text:"Yukine! My sources tell me there’s a new boba store nearby!",shiyu:"happy",yukine:"shocked"},
+      {speaker:"Yukine",text:"W-Whoa! Shiyu! W-wait, really?!",shiyu:"happy",yukine:"shocked"},
+      {speaker:"Shiyu",text:"Yes! It’s only .02 miles away! Shall we go?",shiyu:"happy",yukine:"happy"},
+      {speaker:"",text:"They arrive at the shop.",shiyu:"happy",yukine:"happy"}
+    ],
+    A:[
+      {speaker:"Shiyu",text:"One brown sugar milk tea, large, extra boba, 75% sweetness, less ice please! And for me, a matcha milk tea, no boba, normal sweetness, less ice.",shiyu:"happy",yukine:"happy"},
+      {speaker:"Yukine",text:"You remembered my favorite flavor and preferences…? Ah, let me pay! Please.",shiyu:"happy",yukine:"happy"},
+      {speaker:"Shiyu",text:"Of course! I love you, so I know everything about you! And thank you, that’s so sweet.",shiyu:"happy",yukine:"happy"}
+    ],
+    B:[
+      {speaker:"Yukine",text:"Um, two of these ones please.",shiyu:"neutral",yukine:"neutral"},
+      {speaker:"",text:"He collects their drinks and the cakes.",shiyu:"neutral",yukine:"happy"},
+      {speaker:"Yukine",text:"I um… got some since they looked good.",shiyu:"happy",yukine:"happy"},
+      {speaker:"Shiyu",text:"Ohhh, those look yummy! Thank you, thank you, thank you!",shiyu:"happy",yukine:"happy"}
+    ],
+    ending:[
+      {speaker:"",text:"They walk home, hand in hand, as they drink their tea!",shiyu:"happy",yukine:"happy"},
+      {speaker:"Yukine",text:"We should come back, this is so good!",shiyu:"happy",yukine:"happy"},
+      {speaker:"Shiyu",text:"Anytime you want, my love, I’ll be happy to!",shiyu:"happy",yukine:"happy"}
+    ],
+    baseYukine:10,
+    baseShiyu:10,
+    choiceABonus:{yukine:5,shiyu:0},
+    choiceBBonus:{yukine:0,shiyu:5}
+  }
+};
+
+const params=new URLSearchParams(location.search);
+const spot=params.get("spot")||"picnic";
+const date=DATE_DATA[spot]||DATE_DATA.picnic;
+
+const dialogue=document.getElementById("dialogue");
+const speaker=document.getElementById("speaker");
+const dialogueText=document.getElementById("dialogueText");
+const choices=document.getElementById("choices");
+const result=document.getElementById("result");
+const intro=document.getElementById("intro");
+const coinCount=document.getElementById("coinCount");
+const shiyuWrap=document.getElementById("shiyuWrap");
+const shiyuFace=document.getElementById("shiyuFace");
+const yukineFace=document.getElementById("yukineFace");
+
+let current=[];
+let lineIndex=0;
+let selectedChoice=null;
+let dateStarted=false;
+let dateCompleted=false;
+
+function getCoins(){
+  return Number(localStorage.getItem(COIN_KEY)||0);
+}
+function setCoins(value){
+  value=Math.max(0,Math.floor(Number(value)||0));
+  localStorage.setItem(COIN_KEY,String(value));
+
+  try{
+    const b=JSON.parse(localStorage.getItem(BAKERY_KEY)||"{}");
+    if(b && typeof b==="object"){
+      b.coins=value;
+      localStorage.setItem(BAKERY_KEY,JSON.stringify(b));
+    }
+  }catch(e){}
+
+  coinCount.textContent=value;
+}
+function grantDateTestCoinsOnce(){
+  if(localStorage.getItem(DATE_TEST_COIN_FLAG)==="1") return;
+  setCoins(getCoins()+100);
+  localStorage.setItem(DATE_TEST_COIN_FLAG,"1");
+}
+function loadHub(){
+  try{
+    const h=JSON.parse(localStorage.getItem(HUB_KEY)||"{}");
+    return h && typeof h==="object" ? h : {};
+  }catch(e){
+    return {};
+  }
+}
+function saveHub(h){
+  localStorage.setItem(HUB_KEY,JSON.stringify(h));
+}
+function setFace(character,face){
+  if(character==="shiyu"){
+    shiyuFace.src=`../images/shiyu-${face}.png`;
+  }else{
+    yukineFace.src=`../images/yukine-${face}.png`;
+  }
+}
+
+function hideShiyu(){
+  shiyuWrap.classList.remove("shiyu-glitch-in");
+  shiyuWrap.classList.add("shiyu-hidden");
+}
+
+function showShiyu(){
+  shiyuWrap.classList.remove("shiyu-hidden","shiyu-glitch-in");
+}
+
+function glitchShiyuIn(){
+  shiyuWrap.classList.remove("shiyu-hidden","shiyu-glitch-in");
+
+  /* Restart the animation even if the same date is replayed. */
+  void shiyuWrap.offsetWidth;
+  shiyuWrap.classList.add("shiyu-glitch-in");
+
+  const finish=()=>{
+    shiyuWrap.classList.remove("shiyu-glitch-in");
+    shiyuWrap.removeEventListener("animationend",finish);
+  };
+  shiyuWrap.addEventListener("animationend",finish);
+}
+
+function showLine(line){
+  if(line.shiyuVisible===false){
+    hideShiyu();
+  }else if(line.shiyuGlitchIn){
+    glitchShiyuIn();
+  }else if(!shiyuWrap.classList.contains("shiyu-hidden")){
+    showShiyu();
+  }
+
+  speaker.textContent=line.speaker||"";
+  speaker.className="";
+  if(line.speaker==="Shiyu") speaker.classList.add("shiyu");
+  if(line.speaker==="Yukine") speaker.classList.add("yukine");
+  speaker.style.display=line.speaker ? "block" : "none";
+
+  dialogueText.textContent=line.text;
+
+  if(line.shiyu) setFace("shiyu",line.shiyu);
+  if(line.yukine) setFace("yukine",line.yukine);
+}
+function playSequence(sequence){
+  current=sequence;
+  lineIndex=0;
+  dialogue.style.display="block";
+  choices.style.display="none";
+  showLine(current[lineIndex]);
+}
+function advance(){
+  if(!dateStarted || dateCompleted || dialogue.style.display==="none") return;
+
+  lineIndex++;
+  if(lineIndex<current.length){
+    showLine(current[lineIndex]);
+    return;
+  }
+
+  dialogue.style.display="none";
+
+  if(current===date.opening){
+    choices.style.display="flex";
+  }else if(current===date.A || current===date.B){
+    playSequence(date.ending);
+  }else if(current===date.ending){
+    completeDate();
+  }
+}
+function completeDate(){
+  if(dateCompleted) return;
+  dateCompleted=true;
+
+  let yukineGain=date.baseYukine;
+  let shiyuGain=date.baseShiyu;
+
+  if(selectedChoice==="A"){
+    yukineGain+=date.choiceABonus.yukine;
+    shiyuGain+=date.choiceABonus.shiyu;
+  }
+  if(selectedChoice==="B"){
+    yukineGain+=date.choiceBBonus.yukine;
+    shiyuGain+=date.choiceBBonus.shiyu;
+  }
+
+  const hub=loadHub();
+  hub.yukineAffection=Math.max(0,Math.min(1000,Number(hub.yukineAffection||0)+yukineGain));
+  hub.shiyuAffection=Math.max(0,Math.min(1000,Number(hub.shiyuAffection||0)+shiyuGain));
+  saveHub(hub);
+
+  document.getElementById("yukineReward").textContent=`Yukine +${yukineGain} Affection`;
+  document.getElementById("shiyuReward").textContent=`Shiyu +${shiyuGain} Affection`;
+  result.style.display="flex";
+}
+function goHome(){
+  location.href="../";
+}
+function initDate(){
+  showShiyu();
+
+  document.documentElement.style.setProperty("--character-top",date.characterTop||"-17%");
+  document.documentElement.style.setProperty("--character-top-mobile",date.characterTopMobile||"-21%");
+
+  document.title=`Love & Sweets — ${date.title.replace(/[^A-Za-z0-9 &-]/g,"")}`;
+  document.getElementById("bg").src=date.background;
+  document.getElementById("dateTitle").textContent=date.title;
+  document.getElementById("dateSubtitle").textContent=date.subtitle;
+  document.getElementById("dateCostText").textContent=`Cost: ${date.cost} Heart Coins`;
+  document.getElementById("choiceA").textContent=date.choices.A;
+  document.getElementById("choiceB").textContent=date.choices.B;
+
+  grantDateTestCoinsOnce();
+  coinCount.textContent=getCoins();
+}
+
+document.getElementById("startDate").addEventListener("click",()=>{
+  const coins=getCoins();
+  if(coins<date.cost){
+    document.getElementById("dateCostText").textContent=
+      `You need ${date.cost} Heart Coins. You currently have ${coins}.`;
+    return;
+  }
+
+  setCoins(coins-date.cost);
+  intro.style.display="none";
+  dateStarted=true;
+  playSequence(date.opening);
+});
+
+dialogue.addEventListener("click",advance);
+
+document.getElementById("choiceA").addEventListener("click",()=>{
+  selectedChoice="A";
+  playSequence(date.A);
+});
+document.getElementById("choiceB").addEventListener("click",()=>{
+  selectedChoice="B";
+  playSequence(date.B);
+});
+
+document.getElementById("homeBtn").addEventListener("click",goHome);
+document.getElementById("introHome").addEventListener("click",goHome);
+document.getElementById("resultHome").addEventListener("click",goHome);
+document.getElementById("againBtn").addEventListener("click",()=>{
+  location.reload();
+});
+
+initDate();
+</script>
+</body>
+</html>
