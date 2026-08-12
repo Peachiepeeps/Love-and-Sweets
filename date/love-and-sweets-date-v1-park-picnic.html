@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Love & Sweets — Park Picnic</title>
+<style>
+*{box-sizing:border-box}
+html,body{
+  margin:0;
+  width:100%;
+  height:100%;
+  overflow:hidden;
+  background:#1d2230;
+  font-family:"Trebuchet MS",Arial,sans-serif;
+}
+body{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  touch-action:manipulation;
+}
+#stage{
+  position:relative;
+  width:min(100vw,177.7778vh);
+  height:min(56.25vw,100vh);
+  aspect-ratio:16/9;
+  overflow:hidden;
+  background:#9fdcff;
+  box-shadow:0 0 24px rgba(0,0,0,.25);
+}
+.full{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  pointer-events:none;
+}
+#bg{z-index:1}
+
+.character-layer{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  object-fit:fill;
+  z-index:4;
+  pointer-events:none;
+  user-select:none;
+}
+
+#topBar{
+  position:absolute;
+  z-index:20;
+  left:2.2%;
+  right:2.2%;
+  top:2.2%;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  pointer-events:none;
+}
+.pill{
+  pointer-events:auto;
+  border:3px solid rgba(255,255,255,.95);
+  border-radius:20px;
+  padding:8px 13px;
+  background:rgba(255,246,251,.92);
+  color:#63566d;
+  font-size:clamp(11px,1.2vw,18px);
+  font-weight:900;
+  box-shadow:0 4px 12px rgba(0,0,0,.12);
+}
+#coinPill{
+  display:flex;
+  align-items:center;
+  gap:7px;
+}
+#coinPill img{
+  width:28px;
+  height:28px;
+  object-fit:contain;
+}
+button{font-family:inherit}
+
+#dialogue{
+  position:absolute;
+  z-index:30;
+  left:50%;
+  bottom:3.5%;
+  transform:translateX(-50%);
+  width:76%;
+  min-height:20%;
+  padding:18px 22px 17px;
+  border:4px solid rgba(255,255,255,.96);
+  border-radius:24px;
+  background:rgba(255,246,250,.94);
+  box-shadow:0 8px 24px rgba(0,0,0,.18);
+}
+#speaker{
+  margin-bottom:7px;
+  color:#c05c8a;
+  font-size:clamp(15px,1.8vw,26px);
+  font-weight:900;
+}
+#dialogueText{
+  color:#574f60;
+  font-size:clamp(14px,1.65vw,24px);
+  font-weight:700;
+  line-height:1.35;
+  white-space:pre-line;
+}
+#continueHint{
+  margin-top:8px;
+  text-align:right;
+  color:#93899c;
+  font-size:clamp(10px,1vw,14px);
+  font-weight:800;
+}
+#choices{
+  position:absolute;
+  z-index:35;
+  left:50%;
+  bottom:3.5%;
+  transform:translateX(-50%);
+  width:76%;
+  display:none;
+  gap:10px;
+  flex-direction:column;
+}
+.choice{
+  width:100%;
+  border:4px solid white;
+  border-radius:22px;
+  padding:14px 16px;
+  background:rgba(255,246,250,.96);
+  color:#5d5265;
+  font-size:clamp(13px,1.45vw,21px);
+  font-weight:900;
+  box-shadow:0 6px 18px rgba(0,0,0,.16);
+}
+.choice:active{transform:scale(.99)}
+
+#result{
+  position:absolute;
+  z-index:50;
+  inset:0;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  background:rgba(31,28,38,.35);
+}
+#resultCard{
+  width:min(440px,76%);
+  padding:22px;
+  border:4px solid white;
+  border-radius:28px;
+  background:rgba(255,247,251,.98);
+  text-align:center;
+  color:#5d5265;
+  box-shadow:0 12px 34px rgba(0,0,0,.22);
+}
+#resultCard h2{
+  margin:0 0 12px;
+  color:#c05c8a;
+  font-size:clamp(24px,3vw,40px);
+}
+.rewardLine{
+  margin:8px 0;
+  font-size:clamp(16px,1.8vw,25px);
+  font-weight:900;
+}
+.resultBtn{
+  margin:14px 6px 0;
+  border:3px solid white;
+  border-radius:18px;
+  padding:10px 16px;
+  background:#f3d8e7;
+  color:#5e5265;
+  font-size:clamp(12px,1.3vw,18px);
+  font-weight:900;
+}
+
+#intro{
+  position:absolute;
+  z-index:60;
+  inset:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:rgba(28,30,39,.38);
+}
+#introCard{
+  width:min(480px,78%);
+  padding:24px;
+  border:4px solid white;
+  border-radius:28px;
+  background:rgba(255,247,251,.98);
+  text-align:center;
+  color:#5d5265;
+  box-shadow:0 12px 34px rgba(0,0,0,.24);
+}
+#introCard h1{
+  margin:0 0 6px;
+  color:#c05c8a;
+  font-size:clamp(25px,3.2vw,44px);
+}
+#introCard p{
+  margin:8px 0;
+  font-weight:800;
+  font-size:clamp(13px,1.4vw,19px);
+}
+#startDate{
+  margin-top:10px;
+  border:3px solid white;
+  border-radius:18px;
+  padding:11px 18px;
+  background:#f3d8e7;
+  color:#5e5265;
+  font-size:clamp(14px,1.5vw,20px);
+  font-weight:900;
+}
+
+@media (orientation:portrait){
+  body::before{
+    content:"Rotate your device sideways ♡";
+    position:fixed;
+    inset:0;
+    z-index:999;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:30px;
+    background:#f8e7f0;
+    color:#705c70;
+    font-size:24px;
+    font-weight:900;
+    text-align:center;
+  }
+}
+@supports(height:100dvh){
+  #stage{
+    width:min(100vw,calc(100dvh * 1.777778));
+    height:min(56.25vw,100dvh);
+  }
+}
+@media (orientation:landscape) and (max-height:600px){
+  .character-layer{
+    object-fit:cover;
+    object-position:center bottom;
+  }
+  #stage{
+    transform:scale(1.045,.965);
+    transform-origin:center center;
+  }
+  #dialogue{
+    width:72%;
+    min-height:19%;
+    padding:10px 15px 9px;
+    border-width:3px;
+    border-radius:18px;
+  }
+  #speaker{margin-bottom:3px}
+  #continueHint{margin-top:3px}
+  #choices{width:72%;gap:7px}
+  .choice{
+    padding:9px 12px;
+    border-width:3px;
+    border-radius:17px;
+  }
+  .pill{
+    border-width:2px;
+    padding:5px 9px;
+    border-radius:14px;
+  }
+  #coinPill img{width:20px;height:20px}
+}
+</style>
+</head>
+<body>
+<div id="stage">
+  <img id="bg" class="full" src="../images/date-picnic-bg.png" alt="Park picnic">
+
+  <img class="character-layer" src="../images/shiyu-base.png" alt="Shiyu">
+  <img id="shiyuFace" class="character-layer" src="../images/shiyu-happy.png" alt="Shiyu expression">
+
+  <img class="character-layer" src="../images/yukine-base.png" alt="Yukine">
+  <img id="yukineFace" class="character-layer" src="../images/yukine-neutral.png" alt="Yukine expression">
+
+  <div id="topBar">
+    <button id="homeBtn" class="pill">← Back to Home!</button>
+    <div id="coinPill" class="pill"><img src="../images/heart-coin.png" alt=""> <span id="coinCount">0</span></div>
+  </div>
+
+  <div id="dialogue" style="display:none;">
+    <div id="speaker"></div>
+    <div id="dialogueText"></div>
+    <div id="continueHint">Tap to continue ♡</div>
+  </div>
+
+  <div id="choices">
+    <button class="choice" id="choiceA">Shiyu turns to Yukine and says, “Say ahhhh!”</button>
+    <button class="choice" id="choiceB">Yukine notices a cherry blossom fall onto Shiyu’s hair. He gently removes it.</button>
+  </div>
+
+  <div id="intro">
+    <div id="introCard">
+      <h1>Park Picnic 🌸</h1>
+      <p>A sunny picnic beneath the cherry blossoms.</p>
+      <p>Cost: 20 Heart Coins</p>
+      <button id="startDate">Start Date ♡</button>
+    </div>
+  </div>
+
+  <div id="result">
+    <div id="resultCard">
+      <h2>Date Complete! ♥</h2>
+      <div class="rewardLine" id="yukineReward">Yukine +10</div>
+      <div class="rewardLine" id="shiyuReward">Shiyu +10</div>
+      <button class="resultBtn" id="resultHome">Back Home</button>
+      <button class="resultBtn" id="againBtn">Another Date</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const HUB_KEY="loveAndSweetsHubV1";
+const COIN_KEY="loveAndSweetsCoins";
+const BAKERY_KEY="loveAndSweetsBakeryV1";
+const DATE_COST=20;
+
+const dialogue=document.getElementById("dialogue");
+const speaker=document.getElementById("speaker");
+const dialogueText=document.getElementById("dialogueText");
+const continueHint=document.getElementById("continueHint");
+const choices=document.getElementById("choices");
+const result=document.getElementById("result");
+const intro=document.getElementById("intro");
+const coinCount=document.getElementById("coinCount");
+const shiyuFace=document.getElementById("shiyuFace");
+const yukineFace=document.getElementById("yukineFace");
+
+const scenes={
+  opening:[
+    {speaker:"Shiyu",text:"Ooohhh, it’s so sunny! And look at those! Those are cherry blossoms, right, Yukine?",shiyu:"happy",yukine:"neutral"},
+    {speaker:"Yukine",text:"Too bright… but being here with you makes it okay… Oh, yeah, they are.",shiyu:"happy",yukine:"happy"},
+    {speaker:"Shiyu",text:"So romantic to watch the cherry blossoms fall! I made sandwiches. My research says they’re simple and easy for picnics!",shiyu:"happy",yukine:"happy"},
+    {speaker:"Yukine",text:"I’m hungry, so let’s eat!",shiyu:"happy",yukine:"happy"}
+  ],
+  A:[
+    {speaker:"Yukine",text:"A-ahhhh! My heart is racing…",shiyu:"happy",yukine:"shocked"},
+    {speaker:"Shiyu",text:"You’re so cute! Eat up lots, I made a ton!",shiyu:"happy",yukine:"happy"}
+  ],
+  B:[
+    {speaker:"",text:"There’s a soft moment between them, a single moment of silence as they look at each other.",shiyu:"neutral",yukine:"neutral"},
+    {speaker:"Shiyu",text:"Yukine…",shiyu:"happy",yukine:"shocked"},
+    {speaker:"Yukine",text:"I-I uh, your hair… It had a…",shiyu:"happy",yukine:"shocked"},
+    {speaker:"Shiyu",text:"Hehehe…",shiyu:"happy",yukine:"happy"}
+  ],
+  ending:[
+    {speaker:"Yukine",text:"We should do this again sometime.",shiyu:"happy",yukine:"happy"},
+    {speaker:"Shiyu",text:"Next time I’m bringing dessert!",shiyu:"happy",yukine:"happy"}
+  ]
+};
+
+let current=[];
+let index=0;
+let selectedChoice=null;
+let dateStarted=false;
+let dateCompleted=false;
+
+function getCoins(){
+  return Number(localStorage.getItem(COIN_KEY)||0);
+}
+function setCoins(value){
+  value=Math.max(0,Math.floor(Number(value)||0));
+  localStorage.setItem(COIN_KEY,String(value));
+
+  try{
+    const b=JSON.parse(localStorage.getItem(BAKERY_KEY)||"{}");
+    if(b && typeof b==="object"){
+      b.coins=value;
+      localStorage.setItem(BAKERY_KEY,JSON.stringify(b));
+    }
+  }catch(e){}
+
+  coinCount.textContent=value;
+}
+function loadHub(){
+  try{
+    const h=JSON.parse(localStorage.getItem(HUB_KEY)||"{}");
+    return h && typeof h==="object" ? h : {};
+  }catch(e){
+    return {};
+  }
+}
+function saveHub(h){
+  localStorage.setItem(HUB_KEY,JSON.stringify(h));
+}
+function setFace(character,face){
+  if(character==="shiyu"){
+    shiyuFace.src=`../images/shiyu-${face}.png`;
+  }else{
+    yukineFace.src=`../images/yukine-${face}.png`;
+  }
+}
+function showLine(line){
+  speaker.textContent=line.speaker||"";
+  speaker.style.display=line.speaker ? "block" : "none";
+  dialogueText.textContent=line.text;
+  if(line.shiyu) setFace("shiyu",line.shiyu);
+  if(line.yukine) setFace("yukine",line.yukine);
+}
+function playSequence(sequence){
+  current=sequence;
+  index=0;
+  dialogue.style.display="block";
+  choices.style.display="none";
+  showLine(current[index]);
+}
+function advance(){
+  if(!dateStarted || dateCompleted || dialogue.style.display==="none") return;
+  index++;
+  if(index<current.length){
+    showLine(current[index]);
+    return;
+  }
+
+  dialogue.style.display="none";
+
+  if(current===scenes.opening){
+    choices.style.display="flex";
+  }else if(current===scenes.A || current===scenes.B){
+    playSequence(scenes.ending);
+  }else if(current===scenes.ending){
+    completeDate();
+  }
+}
+function completeDate(){
+  if(dateCompleted) return;
+  dateCompleted=true;
+
+  let yukineGain=10;
+  let shiyuGain=10;
+
+  if(selectedChoice==="A") yukineGain+=5;
+  if(selectedChoice==="B") shiyuGain+=5;
+
+  const hub=loadHub();
+  hub.yukineAffection=Math.max(0,Math.min(1000,Number(hub.yukineAffection||0)+yukineGain));
+  hub.shiyuAffection=Math.max(0,Math.min(1000,Number(hub.shiyuAffection||0)+shiyuGain));
+  saveHub(hub);
+
+  document.getElementById("yukineReward").textContent=`Yukine +${yukineGain} Affection`;
+  document.getElementById("shiyuReward").textContent=`Shiyu +${shiyuGain} Affection`;
+  result.style.display="flex";
+}
+function goHome(){
+  location.href="../";
+}
+
+coinCount.textContent=getCoins();
+
+document.getElementById("startDate").addEventListener("click",()=>{
+  const coins=getCoins();
+  if(coins<DATE_COST){
+    document.querySelector("#introCard p:last-of-type").textContent=`You need ${DATE_COST} Heart Coins. You currently have ${coins}.`;
+    return;
+  }
+
+  setCoins(coins-DATE_COST);
+  intro.style.display="none";
+  dateStarted=true;
+  playSequence(scenes.opening);
+});
+
+dialogue.addEventListener("click",advance);
+
+document.getElementById("choiceA").addEventListener("click",()=>{
+  selectedChoice="A";
+  playSequence(scenes.A);
+});
+document.getElementById("choiceB").addEventListener("click",()=>{
+  selectedChoice="B";
+  playSequence(scenes.B);
+});
+
+document.getElementById("homeBtn").addEventListener("click",goHome);
+document.getElementById("resultHome").addEventListener("click",goHome);
+document.getElementById("againBtn").addEventListener("click",()=>{
+  location.reload();
+});
+</script>
+</body>
+</html>
